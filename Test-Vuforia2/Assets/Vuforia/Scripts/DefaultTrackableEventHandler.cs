@@ -5,6 +5,7 @@ Confidential and Proprietary - Protected under copyright and other laws.
 ==============================================================================*/
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Vuforia
 {
@@ -65,7 +66,7 @@ namespace Vuforia
 
         #region PRIVATE_METHODS
 
-
+        private Text txtRef;
         private void OnTrackingFound()
         {
             Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
@@ -82,8 +83,15 @@ namespace Vuforia
             {
                 component.enabled = true;
             }
+            Debug.Log("Lama "+ ((Vuforia.Word) mTrackableBehaviour.Trackable).StringValue );
 
-            Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
+            GameObject guiText = GameObject.Find("Read_Text");
+            Debug.Log(guiText.GetComponent<TextMesh>().text);
+            guiText.GetComponent<TextMesh>().text += "," + ((Vuforia.Word)mTrackableBehaviour.Trackable).StringValue;
+           //GameObject.Find("GUI_TEXT_NAME").guiText;
+           //txtRef = GetComponent<Text>();
+           // txtRef.text = "text";
+           // Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
         }
 
 

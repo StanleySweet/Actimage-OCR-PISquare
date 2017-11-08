@@ -129,12 +129,13 @@ public class TextEventHandler : MonoBehaviour, ITextRecoEventHandler, IVideoBack
     /// <param name="wordResult">New trackable with current pose</param>
     public void OnWordDetected(WordResult wordResult)
     {
+
+
         var word = wordResult.Word;
         if (ContainsWord(word))
             Debug.LogError("Word was already detected before!");
 
-
-        Debug.Log("Text: New word: " + wordResult.Word.StringValue + "(" + wordResult.Word.ID + ")");
+        //Debug.Log("Text: New word: " + wordResult.Word.StringValue + "(" + wordResult.Word.ID + ")");
         AddWord(wordResult);
     }
 
