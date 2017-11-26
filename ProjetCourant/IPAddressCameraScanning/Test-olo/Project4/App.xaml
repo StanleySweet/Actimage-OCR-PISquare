@@ -2,6 +2,7 @@
     x:Class="Project4.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Project4">
+    xmlns:local="using:Project4"
+    RequestedTheme="Dark">
 
 </Application>

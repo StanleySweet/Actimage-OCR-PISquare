@@ -1,12 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project4", "Project4\Project4.csproj", "{13A45C13-3265-47B8-BC48-A553B569DF55}"
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c} = {3a54661d-3b7e-4977-b9c9-0d36e697685c}
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\ProjetCourant\IPAddressCameraScanning\Test-olo\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj", "{3a54661d-3b7e-4977-b9c9-0d36e697685c}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,26 +45,11 @@ Global
 		{13A45C13-3265-47B8-BC48-A553B569DF55}.Release|x86.ActiveCfg = Release|x86
 		{13A45C13-3265-47B8-BC48-A553B569DF55}.Release|x86.Build.0 = Release|x86
 		{13A45C13-3265-47B8-BC48-A553B569DF55}.Release|x86.Deploy.0 = Release|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|x86.ActiveCfg = Debug|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|x86.Build.0 = Debug|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|x86.ActiveCfg = Release|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|x86.Build.0 = Release|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|x86.ActiveCfg = Master|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|x86.Build.0 = Master|x86
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|x64.ActiveCfg = Debug|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|x64.Build.0 = Debug|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|x64.ActiveCfg = Release|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|x64.Build.0 = Release|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|x64.ActiveCfg = Master|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|x64.Build.0 = Master|x64
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|ARM.ActiveCfg = Debug|ARM
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Debug|ARM.Build.0 = Debug|ARM
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|ARM.ActiveCfg = Release|ARM
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Release|ARM.Build.0 = Release|ARM
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|ARM.ActiveCfg = Master|ARM
-		{3a54661d-3b7e-4977-b9c9-0d36e697685c}.Master|ARM.Build.0 = Master|ARM
- EndGlobalSection
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0817A8C4-4EAA-4A2E-8B30-D3E8CF7145A6}
 	EndGlobalSection
 EndGlobal
