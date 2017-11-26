@@ -24,8 +24,7 @@ namespace Project4
         }
         async void OnLoaded(object sender, RoutedEventArgs args)
         {
-            // NB: this example never sets this but it could.
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
 
             this.cameraPreviewManager = new CameraPreviewManager(this.captureElement);
 
@@ -48,9 +47,7 @@ namespace Project4
 
             await this.StartSpeechAsync();
             this.Reset();
-            // NB: we provide no way to cancel this - we just run forever.
-            await this.ocrProcessor.RunFrameProcessingLoopAsync(
-              cancellationTokenSource.Token);
+
 
 
 
@@ -80,9 +77,18 @@ namespace Project4
             await this.recognizer.ContinuousRecognitionSession.StartAsync();
         }
 
+        CancellationTokenSource cancellationTokenSource;
+
         void Scan()
         {
             this.txtStatus.Text = "scanning for 30s";
+
+            // NB: this example never sets this but it could.
+            cancellationTokenSource = new CancellationTokenSource();
+
+            // NB: we provide no way to cancel this - we just run forever.
+            this.ocrProcessor.RunFrameProcessingLoopAsync(cancellationTokenSource.Token);
+
 
             IPAddressScanner.ScanFirstCameraForIPAddress(
               result =>
@@ -96,6 +102,7 @@ namespace Project4
         {
             this.txtStatus.Text = "say 'scan' to start";
             this.txtResult.Text = string.Empty;
+            cancellationTokenSource?.Cancel();
         }
         void OnSpeechResultGenerated(
           SpeechContinuousRecognitionSession sender,
