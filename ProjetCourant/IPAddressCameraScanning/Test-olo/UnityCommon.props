@@ -1,0 +1,9 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <UnityWSASolutionName>Project4</UnityWSASolutionName>
+        <UnityWSASolutionDir>E:\Users\dolci\Documents\ESILV\PI² A5\Archives\IPAddressCameraScanning\UnityProject\Test-olo\</UnityWSASolutionDir>
+        <UnityProjectDir>E:\Users\dolci\Documents\ESILV\PI² A5\Archives\IPAddressCameraScanning\UnityProject\</UnityProjectDir>
+        <UnityWSAPlayerDir>E:\Software\Unity\Editor\Data\PlaybackEngines\MetroSupport\</UnityWSAPlayerDir>
+        <UnityWSAToolsDir>$(UnityWSASolutionDir)Unity\Tools\</UnityWSAToolsDir>
+    </PropertyGroup>
+</Project>
