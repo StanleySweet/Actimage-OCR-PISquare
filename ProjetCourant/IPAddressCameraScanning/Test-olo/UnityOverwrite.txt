@@ -5,7 +5,7 @@
 # Write a line equal to 'overwrite-all' (without quotes) to overwrite everything (preserved accross builds)
 # Write a line equal to 'keep-all' (without quotes) to keep files regardless their modification (preserved accross builds)
 # Default behavior is to never overwrite files
-Project4.sln: 0C7F255F9F41FC31D237E66EB310213A
+Project4.sln: 93ACD301F0561DA729F2F90527231406
 GeneratedProjects\UWP\Assembly-CSharp\project.json: 4FCF72A4D5EDB37E24C206A7BCFE7AF1
 Project4\App.xaml: 7C97763CBB7CB7515141383DA3A29B03
 Project4\App.xaml.cs: 994433BA8DF053E868E712B2ADC6B857
@@ -13,7 +13,7 @@ Project4\MainPage.xaml: E17BE75A11A8EFAB2C99A8C615E33A8B
 Project4\MainPage.xaml.cs: 0F74FE97658F6445F64566A0C6468405
 Project4\Package.appxmanifest: 817D1E19F35EC72ED7B47EA0978FC4A6
 Project4\project.json: 1D02BC64BAC0D041019673A1C4C51737
-Project4\Project4.csproj: 187E25BA075A5A92CB4932DCFEE966DB
+Project4\Project4.csproj: B7FFAE1FA5AE8F7B659FA62D131467A1
 Project4\Project4.csproj.user: BEFB8AC4886C4CFDD3C68445D6F19B04
 Project4\Assets\SplashScreen.scale-200.png: 60618416282ED104FD1473935716045D
 Project4\Assets\Square150x150Logo.scale-200.png: E02834B4A5DFB97FF8E212C1CACBB084

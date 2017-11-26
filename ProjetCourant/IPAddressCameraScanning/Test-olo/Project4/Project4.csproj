@@ -346,8 +346,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="E:\Users\dolci\Documents\ESILV\PI² A5\Archives\IPAddressCameraScanning\UnityProject\Test-olo\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj">
-      <Project>{fd9a78f6-0cd7-4ae0-b901-0a7d73f87a8b}</Project>
+    <ProjectReference Include="E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\ProjetCourant\IPAddressCameraScanning\Test-olo\GeneratedProjects\UWP\Assembly-CSharp\Assembly-CSharp.csproj">
+      <Project>{3a54661d-3b7e-4977-b9c9-0d36e697685c}</Project>
       <Name>Assembly-CSharp</Name>
       <Private>False</Private>
     </ProjectReference>
