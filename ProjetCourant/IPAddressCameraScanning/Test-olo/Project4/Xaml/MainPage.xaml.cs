@@ -24,8 +24,6 @@ namespace Project4
         }
         async void OnLoaded(object sender, RoutedEventArgs args)
         {
-
-
             this.cameraPreviewManager = new CameraPreviewManager(this.captureElement);
 
             this.videoProperties =
@@ -88,15 +86,6 @@ namespace Project4
 
             // NB: we provide no way to cancel this - we just run forever.
             this.ocrProcessor.RunFrameProcessingLoopAsync(cancellationTokenSource.Token);
-
-
-            IPAddressScanner.ScanFirstCameraForIPAddress(
-              result =>
-              {
-                  this.txtStatus.Text = "done, say 'reset' to reset";
-                  this.txtResult.Text = result?.ToString() ?? "none";
-              },
-              TimeSpan.FromSeconds(30));
         }
         void Reset()
         {

@@ -1,20 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using UnityPlayer;
 
@@ -160,7 +149,7 @@ namespace Project4
         private void InitializeUnity(string args)
         {
 #if UNITY_WP_8_1 || UNITY_UWP
-            ApplicationView.GetForCurrentView().SuppressSystemOverlays = true;
+            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
 #endif
 
 #if UNITY_WP_8_1
