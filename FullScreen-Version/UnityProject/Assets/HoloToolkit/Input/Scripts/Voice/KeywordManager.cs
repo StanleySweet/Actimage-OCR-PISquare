@@ -46,7 +46,7 @@ namespace HoloToolkit.Unity.InputModule
         private KeywordRecognizer keywordRecognizer;
         private readonly Dictionary<String, UnityEvent> responses = new Dictionary<String, UnityEvent>();
 
-        void Start()
+        public void Start()
         {
             Int32 keywordCount = KeywordsAndResponses.Length;
             if (keywordCount <= 0)

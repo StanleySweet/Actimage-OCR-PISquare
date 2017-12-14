@@ -15615,12 +15615,12 @@
   },
   "project": {
     "restore": {
-      "projectUniqueName": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\ProjetCourant\\IPAddressCameraScanning\\MediaFrameQrProcessing\\MediaFrameQrProcessing.csproj",
+      "projectUniqueName": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\MediaFrameQrProcessing\\MediaFrameQrProcessing.csproj",
       "projectName": "MediaFrameQrProcessing",
-      "projectPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\ProjetCourant\\IPAddressCameraScanning\\MediaFrameQrProcessing\\MediaFrameQrProcessing.csproj",
-      "projectJsonPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\ProjetCourant\\IPAddressCameraScanning\\MediaFrameQrProcessing\\project.json",
+      "projectPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\MediaFrameQrProcessing\\MediaFrameQrProcessing.csproj",
+      "projectJsonPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\MediaFrameQrProcessing\\project.json",
       "packagesPath": "C:\\Users\\dolci\\.nuget\\packages\\",
-      "outputPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\ProjetCourant\\IPAddressCameraScanning\\MediaFrameQrProcessing\\obj\\",
+      "outputPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\MediaFrameQrProcessing\\obj\\",
       "projectStyle": "ProjectJson",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\"

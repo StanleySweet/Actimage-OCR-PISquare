@@ -41,6 +41,7 @@ namespace MediaFrameQrProcessing.Processors
                     if (ocrResult == null)
                         return false;
 
+                    // ocrResult.Lines[1].Words[1].BoundingRect
                     IEnumerable<string> matchingWordsPlural = FindSimilarWords(ocrResult.Text, m_RequestWord + 's');
 
                     if (!ocrResult.Text.Contains(m_RequestWord) 

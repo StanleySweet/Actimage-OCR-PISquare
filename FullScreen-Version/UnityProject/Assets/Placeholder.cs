@@ -1,9 +1,13 @@
-﻿using System.Threading;
+﻿
+using System;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
 #if !UNITY_EDITOR
     using OCR_Library;
+    using MediaFrameQrProcessing.Wrappers;
+    using HoloToolkit.Unity.InputModule;
+    using System.Threading;
     using Windows.Media.MediaProperties;
     using Windows.UI.Xaml.Controls;
     using Windows.Media.Ocr;
@@ -13,6 +17,7 @@ public class Placeholder : MonoBehaviour
 {
     private TextMesh m_TextMesh;
     private DictationRecognizer m_DictationRecognizer;
+    private Boolean m_Resetted;
 
 
 #if !UNITY_EDITOR
@@ -37,7 +42,7 @@ public class Placeholder : MonoBehaviour
     {
         m_TextMesh = GetComponentInChildren<TextMesh>();
         m_DictationRecognizer = new DictationRecognizer();
-
+        m_Resetted = false;
 #if !UNITY_EDITOR
         // TODO : Add something to the unity scene broken
         this.m_CameraPreviewManager = new CameraPreviewManager(this.m_CaptureElement);
@@ -61,6 +66,7 @@ public class Placeholder : MonoBehaviour
 
 #endif
         InitDictationRecognizer();
+        this.m_TextMesh.text = "Reset in progress...";
         this.OnReset();
     }
 
@@ -103,10 +109,13 @@ public class Placeholder : MonoBehaviour
     //        this.txtWholeText.Text = ocrResult.Text;
     //    }
     //}
+
 #endif
 
     private void InitDictationRecognizer()
     {
+
+
         m_DictationRecognizer.DictationResult += (text, confidence) =>
         {
             this.m_TextMesh.text = text;
@@ -138,6 +147,15 @@ public class Placeholder : MonoBehaviour
         if (PhraseRecognitionSystem.Status.Equals(SpeechSystemStatus.Running))
             PhraseRecognitionSystem.Shutdown();
 
+        while (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status)) ;
+
+        if (m_Resetted)
+        {
+            m_Resetted = false;
+            InitDictationRecognizer();
+        }
+            
+
         if (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Stopped))
             m_DictationRecognizer.Start();
 
@@ -151,10 +169,28 @@ public class Placeholder : MonoBehaviour
     /// </summary>
     public void OnReset()
     {
-        this.m_TextMesh.text = "Reset in progress...";
+        
+        //WordScanner.ScanFirstCameraForWords(
+        //result =>
+        //{
+        //    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+        //    {
+        //        // result here is a System.Net.IPAddress...
+        //        this.m_TextMesh.text = result?.ToString() ?? "not found";
+        //    },
+        //    false);
+        //},
+        //TimeSpan.FromSeconds(30), "lol");
+        
+
+
 
         if (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Running))
             m_DictationRecognizer.Stop();
+
+        this.m_TextMesh.text = "Reset in progress...";
+        while (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Running));
+        m_Resetted = true;
 
         if (PhraseRecognitionSystem.Status.Equals(SpeechSystemStatus.Stopped))
             PhraseRecognitionSystem.Restart();
