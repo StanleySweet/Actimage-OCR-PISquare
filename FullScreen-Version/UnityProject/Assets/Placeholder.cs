@@ -4,128 +4,46 @@ using UnityEngine;
 using UnityEngine.Windows.Speech;
 
 #if !UNITY_EDITOR
-    using OCR_Library;
-    using MediaFrameQrProcessing.Wrappers;
     using HoloToolkit.Unity.InputModule;
+    using MediaFrameQrProcessing.Wrappers;
     using System.Threading;
     using Windows.Media.MediaProperties;
-    using Windows.UI.Xaml.Controls;
     using Windows.Media.Ocr;
+    using System.Linq;
 #endif
 
 public class Placeholder : MonoBehaviour
 {
     private TextMesh m_TextMesh;
+    private Canvas m_Canvas;
     private DictationRecognizer m_DictationRecognizer;
     private Boolean m_Resetted;
 
-
-#if !UNITY_EDITOR
-    private CancellationTokenSource m_CancellationTokenSource;
-    private OcrDetectionFrameProcessor m_OcrProcessor;
-    private CameraPreviewManager m_CameraPreviewManager;
-    private VideoEncodingProperties m_VideoProperties;
-    private CaptureElement m_CaptureElement;
-#endif
-
-
-
-    private async void DisplayCameraPreview()
-    {
-
-    }
-
-
-
-
-    private async void Start()
+    private void Start()
     {
         m_TextMesh = GetComponentInChildren<TextMesh>();
-        m_DictationRecognizer = new DictationRecognizer();
+        m_Canvas = GetComponentInChildren<Canvas>();
         m_Resetted = false;
-#if !UNITY_EDITOR
-        // TODO : Add something to the unity scene broken
-        this.m_CameraPreviewManager = new CameraPreviewManager(this.m_CaptureElement);
-
-        this.m_VideoProperties =
-          await this.m_CameraPreviewManager.StartPreviewToCaptureElementAsync(
-            vcd => vcd.EnclosureLocation.Panel == Windows.Devices.Enumeration.Panel.Front);
-
-        this.m_OcrProcessor = new OcrDetectionFrameProcessor(
-          this.m_CameraPreviewManager.MediaCapture, this.m_VideoProperties);
-
-        this.m_OcrProcessor.FrameProcessed += (s, e) =>
-        {
-            //this.Dispatcher.RunAsync(
-            //  CoreDispatcherPriority.Normal,
-            //  () =>
-            //  {
-            //      this.DrawOcrResults(e.Results);
-            //  });
-        };
-
-#endif
         InitDictationRecognizer();
         this.m_TextMesh.text = "Reset in progress...";
-        this.OnReset();
+        this.Reset();
     }
-
-#if !UNITY_EDITOR
-    //void DrawOcrResults(OcrResult ocrResult)
-    //{
-    //    if ((ocrResult == null) ||
-    //      (ocrResult.Lines == null) ||
-    //      (ocrResult.Lines.Count == 0))
-    //    {
-    //        this.drawCanvas.Children.Clear();
-    //        this.txtWholeText.Text = string.Empty;
-    //    }
-    //    else
-    //    {
-    //        var words = ocrResult.Lines.SelectMany(l => l.Words).ToList();
-
-    //        // draw any words that we have recognised, doing our best to
-    //        // make use of rectangles that are already on the canvas.
-    //        for (int i = 0; i < words.Count; i++)
-    //        {
-    //            var word = words[i];
-    //            DisplayBox drawBox = CreateOrReuseDiplayBox(i);
-
-    //            var scaledBox = this.ScaleBoxToCanvas(word.BoundingRect);
-    //            Canvas.SetLeft(drawBox, scaledBox.Left);
-    //            Canvas.SetTop(drawBox, scaledBox.Top);
-    //            drawBox.Width = scaledBox.Width;
-    //            drawBox.Height = scaledBox.Height;
-    //            drawBox.Text = word.Text;
-    //            this.rotateTransform.Angle = ocrResult.TextAngle ?? 0.0d;
-    //        }
-
-    //        // Get rid of any rectangles that we have which no longer represent words
-    //        // that we have recognised.
-    //        for (int i = this.drawCanvas.Children.Count - 1; i >= words.Count; i--)
-    //        {
-    //            this.drawCanvas.Children.RemoveAt(i);
-    //        }
-    //        this.txtWholeText.Text = ocrResult.Text;
-    //    }
-    //}
-
-#endif
 
     private void InitDictationRecognizer()
     {
-
+        m_DictationRecognizer = new DictationRecognizer();
 
         m_DictationRecognizer.DictationResult += (text, confidence) =>
         {
             this.m_TextMesh.text = text;
+            this.m_TextMesh.text += RecognizeText(text);
         };
 
         m_DictationRecognizer.DictationHypothesis += (text) =>
         {
             this.m_TextMesh.text = text;
             if ("stop".Equals(text))
-                OnReset();
+                Reset();
         };
 
         m_DictationRecognizer.DictationComplete += (completionCause) =>
@@ -138,13 +56,12 @@ public class Placeholder : MonoBehaviour
         {
             Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
         };
-
     }
     public void OnScan()
     {
         this.m_TextMesh.text = "Scanning for 30s";
 
-        if (PhraseRecognitionSystem.Status.Equals(SpeechSystemStatus.Running))
+        if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
             PhraseRecognitionSystem.Shutdown();
 
         while (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status)) ;
@@ -154,12 +71,10 @@ public class Placeholder : MonoBehaviour
             m_Resetted = false;
             InitDictationRecognizer();
         }
-            
 
-        if (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Stopped))
+
+        if (SpeechSystemStatus.Stopped.Equals(m_DictationRecognizer.Status))
             m_DictationRecognizer.Start();
-
-        RecognizeText();
 
     }
 
@@ -167,52 +82,39 @@ public class Placeholder : MonoBehaviour
     /// This function is called on start and each time the users stop the application
     /// The aim is to switch between the different voices recognition systems.
     /// </summary>
-    public void OnReset()
+    public void Reset()
     {
-        
-        //WordScanner.ScanFirstCameraForWords(
-        //result =>
-        //{
-        //    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-        //    {
-        //        // result here is a System.Net.IPAddress...
-        //        this.m_TextMesh.text = result?.ToString() ?? "not found";
-        //    },
-        //    false);
-        //},
-        //TimeSpan.FromSeconds(30), "lol");
-        
-
-
-
-        if (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Running))
-            m_DictationRecognizer.Stop();
-
         this.m_TextMesh.text = "Reset in progress...";
-        while (m_DictationRecognizer.Status.Equals(SpeechSystemStatus.Running));
+
+        if (SpeechSystemStatus.Running.Equals(m_DictationRecognizer.Status))
+            m_DictationRecognizer.Dispose();
+
+        while (SpeechSystemStatus.Running.Equals(m_DictationRecognizer.Status)) { };
         m_Resetted = true;
 
-        if (PhraseRecognitionSystem.Status.Equals(SpeechSystemStatus.Stopped))
+        if (SpeechSystemStatus.Stopped.Equals(PhraseRecognitionSystem.Status))
             PhraseRecognitionSystem.Restart();
 
-#if !UNITY_EDITOR
-        m_CancellationTokenSource?.Cancel();
-#endif
-
+        this.m_TextMesh.text = "Reset done...";
         this.m_TextMesh.text = "Say 'Search for' to start";
     }
 
-    public void RecognizeText()
+    public string RecognizeText(string text)
     {
-
-
-
+        string resultStatistics = string.Empty;
 #if !UNITY_EDITOR
-    m_CancellationTokenSource = new CancellationTokenSource();
-    this.m_OcrProcessor.RunFrameProcessingLoopAsync(m_CancellationTokenSource.Token);
+        WordScanner.ScanFirstCameraForWords(
+        result =>
+        {
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                resultStatistics = result.Where(r => r.IsExactMatch()) + " exact match(es) were found. " + result.Where(r => !r.IsExactMatch()) + "close match(es) were found";
+            },
+            false);
+        },
+        TimeSpan.FromSeconds(30), text);
 #endif
 
-
-
+        return resultStatistics;
     }
 }

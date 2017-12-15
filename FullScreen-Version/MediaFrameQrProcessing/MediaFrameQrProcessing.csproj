@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\ActiDetectedWord.cs" />
     <Compile Include="Math\LevenshteinDistance.cs" />
     <Compile Include="Processors\MediaCaptureFrameProcessor.cs" />
     <Compile Include="Processors\WordFrameProcessor.cs" />

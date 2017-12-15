@@ -5,16 +5,16 @@ using Windows.Graphics.Imaging;
 using Windows.Media.Capture.Frames;
 using Windows.Media.Ocr;
 using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using Windows.Media.Capture;
+using MediaFrameQrProcessing.Entities;
 
 namespace MediaFrameQrProcessing.Processors
 {
     public class WordFrameProcessor : MediaCaptureFrameProcessor
     {
-        public string Result { get; private set; }
+        public List<ActiDetectedWord> Result { get; private set; }
         private string m_RequestWord;
         private OcrEngine m_OcrEngine;
 
@@ -41,15 +41,18 @@ namespace MediaFrameQrProcessing.Processors
                     if (ocrResult == null)
                         return false;
 
-                    // ocrResult.Lines[1].Words[1].BoundingRect
-                    IEnumerable<string> matchingWordsPlural = FindSimilarWords(ocrResult.Text, m_RequestWord + 's');
+                    foreach (OcrLine line in ocrResult.Lines)
+                    {
+                        foreach (OcrWord word in line.Words)
+                        {
+                            if (word.Text.Contains(m_RequestWord))
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
+                            else if (LevenshteinDistance.Compute(m_RequestWord, word.Text) <= 2)
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
+                        }
+                    }
 
-                    if (!ocrResult.Text.Contains(m_RequestWord) 
-                        && !ocrResult.Text.Contains(m_RequestWord + 's') && matchingWordsPlural.Count() == 0)
-                        return false;
-
-                    this.Result = Regex.Matches(ocrResult.Text, m_RequestWord).Count.ToString() + " exact match(es) and " + matchingWordsPlural.Count() + " approximate matches found";
-                    return true;
+                    return Result.Count > 0;
                 }
                 catch
                 {
