@@ -1,8 +1,7 @@
-﻿using System;
-using UnityEngine;
-
-namespace Assets
+﻿namespace Assets
 {
+    using System;
+    using UnityEngine;
     class Constants
     {
         public static Color PERFECT_MATCH_COLOR = Color.green;
