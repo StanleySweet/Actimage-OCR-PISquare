@@ -29,21 +29,27 @@
 
         private void Start()
         {
+            // Important : If this is not disabled dictation recognizer will 
+            // not start
+            this.DisablePhraseRecognitionSystem();
             this.m_TextMesh = GetComponentInChildren<TextMesh>();
+            this.m_Searching = false;
+            this.m_Validated = false;
+            this.m_StartedRecognition = false;
             this.m_Rectangles = new List<Rect>();
             this.m_Colors = new List<Color>();
-            this.m_Searching = false;
             this.m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
-            this.m_StartedRecognition = false;
-            if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
-                PhraseRecognitionSystem.Shutdown();
-
             this.InitDictationRecognizer();
             this.Reset();
 
-
             if (SpeechSystemStatus.Stopped.Equals(this.m_DictationRecognizer.Status))
                 this.m_DictationRecognizer.Start();
+        }
+
+        private void DisablePhraseRecognitionSystem()
+        {
+            if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
+                PhraseRecognitionSystem.Shutdown();
         }
 
         private void InitDictationRecognizer()
@@ -84,7 +90,7 @@
                 if (!Constants.VALIDATION_TEXT.Equals(text))
                     this.m_WordToSearch = text;
 
-                this.m_TextMesh.text = "Le mot à rechercher est " + this.m_WordToSearch + " \n dites 'valider' pour continuer";
+                this.m_TextMesh.text = String.Format("Le mot à rechercher est {0} \n dites 'valider' pour continuer.", this.m_WordToSearch);
             }
 
             if (Constants.VALIDATION_TEXT.Equals(text))
@@ -100,7 +106,7 @@
 
         private void ValidateSearch()
         {
-            this.m_TextMesh.text = "Recherche en cours pour le mot " + this.m_WordToSearch;
+            this.m_TextMesh.text = String.Format("Recherche en cours pour le mot '{0}'.", this.m_WordToSearch);
             this.m_Validated = true;
         }
 
@@ -110,7 +116,7 @@
         /// </summary>
         private void PromptForSearchWord()
         {
-            this.m_TextMesh.text = "Please say a word. Stay 'Stop' to cancel ";
+            this.m_TextMesh.text = "Donnez le mot à rechercher. \n Dites 'Stop' pour annuler.";
             this.m_Searching = true;
         }
 
@@ -166,7 +172,7 @@
                     m_Rectangles.Clear();
                     m_Colors.Clear();
 
-                    for (var i = 0; i < result.Count; ++i)
+                    for (Int16 i = 0; i < result.Count; ++i)
                     {
                         m_Rectangles.Add(new Rect(result[i].PosX, result[i].PosY, result[i].Width, result[i].Height));
                         m_Colors.Add(result[i].IsExactMatch() ? Constants.PERFECT_MATCH_COLOR : Constants.APPROXIMATE_MATCH_COLOR);
@@ -199,9 +205,12 @@
 #endif
             try
             {
-                for (var j = 0; j < m_Rectangles.Count; ++j)
-                    for (var i = 0; i < DrawRectOutlines(m_Rectangles[j], 2).Count; ++i)
-                        GUI.DrawTexture(DrawRectOutlines(m_Rectangles[j], 2)[i], Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, m_Colors[j], 2, 5);
+                for (Int16 j = 0; j < m_Rectangles.Count; ++j)
+                {
+                    var borderRectangels = DrawRectOutlines(m_Rectangles[j], 2);
+                    for (Int16 i = 0; i < borderRectangels.Count; ++i)
+                        GUI.DrawTexture(borderRectangels[i], Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, m_Colors[j], 2, 5);
+                }
             }
             catch (Exception ex)
             {
