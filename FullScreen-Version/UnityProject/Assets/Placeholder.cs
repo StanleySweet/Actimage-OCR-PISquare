@@ -1,120 +1,236 @@
-﻿
-using System;
-using UnityEngine;
-using UnityEngine.Windows.Speech;
+﻿namespace Assets
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.Windows.Speech;
 
 #if !UNITY_EDITOR
     using HoloToolkit.Unity.InputModule;
-    using MediaFrameQrProcessing.Wrappers;
     using System.Threading;
     using Windows.Media.MediaProperties;
+    using MediaFrameQrProcessing.Wrappers;
+    using MediaFrameQrProcessing.Entities;
     using Windows.Media.Ocr;
     using System.Linq;
 #endif
-
-public class Placeholder : MonoBehaviour
-{
-    private TextMesh m_TextMesh;
-    private Canvas m_Canvas;
-    private DictationRecognizer m_DictationRecognizer;
-    private Boolean m_Resetted;
-
-    private void Start()
+    public class Placeholder : MonoBehaviour
     {
-        m_TextMesh = GetComponentInChildren<TextMesh>();
-        m_Canvas = GetComponentInChildren<Canvas>();
-        m_Resetted = false;
-        InitDictationRecognizer();
-        this.m_TextMesh.text = "Reset in progress...";
-        this.Reset();
-    }
+        private TextMesh m_TextMesh;
+        private DictationRecognizer m_DictationRecognizer;
+        private Boolean m_Searching;
+        private Boolean m_Validated;
+        private Boolean m_StartedRecognition;
+        private String m_WordToSearch;
+        private List<Rect> m_Rectangles;
+        private List<Color> m_Colors;
+        private System.Diagnostics.Stopwatch m_StopWatch;
 
-    private void InitDictationRecognizer()
-    {
-        m_DictationRecognizer = new DictationRecognizer();
-
-        m_DictationRecognizer.DictationResult += (text, confidence) =>
+        private void Start()
         {
-            this.m_TextMesh.text = text;
-            this.m_TextMesh.text += RecognizeText(text);
-        };
+            this.m_TextMesh = GetComponentInChildren<TextMesh>();
+            this.m_Rectangles = new List<Rect>();
+            this.m_Colors = new List<Color>();
+            this.m_Searching = false;
+            this.m_StopWatch = System.Diagnostics.Stopwatch.StartNew();
+            this.m_StartedRecognition = false;
+            if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
+                PhraseRecognitionSystem.Shutdown();
 
-        m_DictationRecognizer.DictationHypothesis += (text) =>
+            this.InitDictationRecognizer();
+            this.Reset();
+
+
+            if (SpeechSystemStatus.Stopped.Equals(this.m_DictationRecognizer.Status))
+                this.m_DictationRecognizer.Start();
+        }
+
+        private void InitDictationRecognizer()
         {
-            this.m_TextMesh.text = text;
-            if ("stop".Equals(text))
-                Reset();
-        };
+            m_DictationRecognizer = new DictationRecognizer();
 
-        m_DictationRecognizer.DictationComplete += (completionCause) =>
+            this.m_DictationRecognizer.DictationResult += (text, confidence) =>
+            {
+                Scan(text);
+            };
+
+            this.m_DictationRecognizer.DictationHypothesis += (text) =>
+            {
+            };
+
+            this.m_DictationRecognizer.DictationComplete += (completionCause) =>
+            {
+                if (completionCause != DictationCompletionCause.Complete)
+                    Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
+            };
+
+            this.m_DictationRecognizer.DictationError += (error, hresult) =>
+            {
+                Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
+            };
+        }
+        public void Scan(string text)
         {
-            if (completionCause != DictationCompletionCause.Complete)
-                Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
-        };
+            if(!this.m_Searching && Constants.SEARCH_KEYWORD.Equals(text))
+            {
+                PromptForSearchWord();
+                return;
+            }
 
-        m_DictationRecognizer.DictationError += (error, hresult) =>
+            if (this.m_Searching)
+            {
+                if (!this.m_Validated)
+                {
+                    if (!Constants.VALIDATION_TEXT.Equals(text))
+                        this.m_WordToSearch = text;
+
+                    this.m_TextMesh.text = "Le mot à rechercher est " + this.m_WordToSearch + " \n dites 'valider' pour continuer";
+                }
+
+                if (Constants.VALIDATION_TEXT.Equals(text))
+                    ValidateSearch();
+
+                if (this.m_Validated && !this.m_StartedRecognition)
+                    StartRecognition();
+
+                if (Constants.STOP_TEXT.Equals(text) || TimeoutExceeded())
+                    Reset();
+            }
+        }
+
+        private void ValidateSearch()
         {
-            Debug.LogErrorFormat("Dictation error: {0}; HResult = {1}.", error, hresult);
-        };
-    }
-    public void OnScan()
-    {
-        this.m_TextMesh.text = "Scanning for 30s";
+            this.m_TextMesh.text = "Recherche en cours pour le mot " + this.m_WordToSearch;
+            this.m_Validated = true;
+        }
 
-        if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
-            PhraseRecognitionSystem.Shutdown();
-
-        while (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status)) ;
-
-        if (m_Resetted)
+        /// <summary>
+        /// Init the search by setting the flag
+        /// Displays a message to the user.
+        /// </summary>
+        private void PromptForSearchWord()
         {
-            m_Resetted = false;
-            InitDictationRecognizer();
+            this.m_TextMesh.text = "Please say a word. Stay 'Stop' to cancel ";
+            this.m_Searching = true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns> Wether the 30 seconds have been elapsed</returns>
+        private bool TimeoutExceeded()
+        {
+            return this.m_StopWatch.Elapsed.Seconds > Constants.TIMEOUT;
+        }
+
+        /// <summary>
+        /// Start text recognition.
+        /// </summary>
+        private void StartRecognition()
+        {
+            this.m_StartedRecognition = true;
+            this.m_StopWatch.Start();
+            this.m_TextMesh.text = RecognizeText(this.m_WordToSearch);
         }
 
 
-        if (SpeechSystemStatus.Stopped.Equals(m_DictationRecognizer.Status))
-            m_DictationRecognizer.Start();
-
-    }
-
-    /// <summary>
-    /// This function is called on start and each time the users stop the application
-    /// The aim is to switch between the different voices recognition systems.
-    /// </summary>
-    public void Reset()
-    {
-        this.m_TextMesh.text = "Reset in progress...";
-
-        if (SpeechSystemStatus.Running.Equals(m_DictationRecognizer.Status))
-            m_DictationRecognizer.Dispose();
-
-        while (SpeechSystemStatus.Running.Equals(m_DictationRecognizer.Status)) { };
-        m_Resetted = true;
-
-        if (SpeechSystemStatus.Stopped.Equals(PhraseRecognitionSystem.Status))
-            PhraseRecognitionSystem.Restart();
-
-        this.m_TextMesh.text = "Reset done...";
-        this.m_TextMesh.text = "Say 'Search for' to start";
-    }
-
-    public string RecognizeText(string text)
-    {
-        string resultStatistics = string.Empty;
-#if !UNITY_EDITOR
-        WordScanner.ScanFirstCameraForWords(
-        result =>
+        /// <summary>
+        /// This function is called on start and each time the users stop the application
+        /// The aim is to switch between the different voices recognition systems.
+        /// </summary>
+        public void Reset()
         {
-            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-            {
-                resultStatistics = result.Where(r => r.IsExactMatch()) + " exact match(es) were found. " + result.Where(r => !r.IsExactMatch()) + "close match(es) were found";
-            },
-            false);
-        },
-        TimeSpan.FromSeconds(30), text);
-#endif
+            this.m_StopWatch.Reset();
+            this.m_TextMesh.text = "Reset in progress...";
+            this.m_Validated = false;
+            this.m_Searching = false;
+            this.m_TextMesh.text = "Say 'Rechercher' to start";
 
-        return resultStatistics;
+        }
+
+        public string RecognizeText(string text)
+        {
+            if (text == "42")
+                text = "quarante deux";
+
+
+            string resultStatistics = string.Empty;
+
+            try
+            {
+#if !UNITY_EDITOR
+                List<ActiDetectedWord> resultat = new List<ActiDetectedWord>();
+                WordScanner.ScanFirstCameraForWords(
+                result =>
+                {
+                    m_Rectangles.Clear();
+                    m_Colors.Clear();
+
+                    for (var i = 0; i < result.Count; ++i)
+                    {
+                        m_Rectangles.Add(new Rect(result[i].PosX, result[i].PosY, result[i].Width, result[i].Height));
+                        m_Colors.Add(result[i].IsExactMatch() ? Constants.PERFECT_MATCH_COLOR : Constants.APPROXIMATE_MATCH_COLOR);
+                    }
+                    resultat = result;
+                },
+                TimeSpan.FromSeconds(Constants.TIMEOUT), text);
+                resultStatistics = resultat.Where(r => r.IsExactMatch()).Count() + " exact match(es) were found. \n " + resultat.Where(r => !r.IsExactMatch()).Count() + " close match(es) were found. \n for the word " + text;
+#endif
+            }
+            catch (Exception ex)
+            {
+                print("Erreur lors de la recherche de mots" + ex.Message);
+                resultStatistics = string.Format("0 exact match(es) were found. 0 close match(es) were found for the word {0}", text);
+            }
+
+            return resultStatistics;
+        }
+
+        /// <summary>
+        /// Called automatically to the engine to refresh the UI.
+        /// </summary>
+        void OnGUI()
+        {
+#if UNITY_EDITOR
+            m_Rectangles.Add(new Rect(75, 50, 200, 50));
+            m_Rectangles.Add(new Rect(200, 500, 200, 50));
+            m_Colors.Add(Constants.PERFECT_MATCH_COLOR);
+            m_Colors.Add(Constants.APPROXIMATE_MATCH_COLOR);
+#endif
+            try
+            {
+                for (var j = 0; j < m_Rectangles.Count; ++j)
+                    for (var i = 0; i < DrawRectOutlines(m_Rectangles[j], 2).Count; ++i)
+                        GUI.DrawTexture(DrawRectOutlines(m_Rectangles[j], 2)[i], Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, m_Colors[j], 2, 5);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("Erreur lors de l'affichage du/des rectangle(s). " + ex.Message);
+            }
+
+        }
+        /// <summary>
+        /// Return a list of rectangles to make the outline.
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="borderWidth"></param>
+        /// <returns></returns>
+        private List<Rect> DrawRectOutlines(Rect rectangle, int borderWidth)
+        {
+            var rectangles = new List<Rect>()
+        {
+            new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
+            new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
+            new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
+            new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
+        };
+            return rectangles;
+        }
+        private IEnumerator DelaySeconds(int seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+        }
     }
+
 }

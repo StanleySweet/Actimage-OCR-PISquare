@@ -1,18 +1,18 @@
-﻿using MediaFrameQrProcessing.Entities;
-using MediaFrameQrProcessing.Processors;
-using MediaFrameQrProcessing.VideoDeviceFinders;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Media.MediaProperties;
-
-
-namespace MediaFrameQrProcessing.Wrappers
+﻿namespace MediaFrameQrProcessing.Wrappers
 {
+    using MediaFrameQrProcessing.Entities;
+    using MediaFrameQrProcessing.Processors;
+    using MediaFrameQrProcessing.VideoDeviceFinders;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+    using Windows.Devices.Enumeration;
+    using Windows.Media.MediaProperties;
+
     public static class WordScanner
     {
-        public static WordFrameProcessor m_FrameProcessor;
+        private static WordFrameProcessor m_FrameProcessor;
 
         /// <summary>
         /// Note - I keep this frame processor around which means keeping the
@@ -28,18 +28,32 @@ namespace MediaFrameQrProcessing.Wrappers
             WordFrameProcessor frameProcessor = null;
             try
             {
-
-                MediaFrameSourceFinder mediaFrameSourceFinder = new MediaFrameSourceFinder();
-                // We want a source of media frame groups which contains a color video
-                // preview (and we'll take the first one).
-                bool populated = await mediaFrameSourceFinder.PopulateAsync(MediaFrameSourceFinder.ColorVideoPreviewFilter, MediaFrameSourceFinder.FirstOrDefault);
-                if (!populated)
-                    return null;
-
-                // We'll take the first video capture device.
-                DeviceInformation videoCaptureDevice = await VideoCaptureDeviceFinder.FindFirstOrDefaultAsync();
-                if (videoCaptureDevice == null)
-                    return null;
+                MediaFrameSourceFinder mediaFrameSourceFinder = null;
+                DeviceInformation videoCaptureDevice = null;
+                try
+                {
+                    mediaFrameSourceFinder = new MediaFrameSourceFinder();
+                    // We want a source of media frame groups which contains a color video
+                    // preview (and we'll take the first one).
+                    bool populated = await mediaFrameSourceFinder.PopulateAsync(MediaFrameSourceFinder.ColorVideoPreviewFilter, MediaFrameSourceFinder.FirstOrDefault);
+                    if (!populated)
+                        return null;
+                }
+                catch(Exception ex)
+                {
+                    Debug.Write("Erreur lors de la récupération du MediaFrameSourceFinder. \n" + ex.Message);
+                }
+                try
+                {
+                    // We'll take the first video capture device.
+                    videoCaptureDevice = await VideoCaptureDeviceFinder.FindFirstOrDefaultAsync();
+                    if (videoCaptureDevice == null)
+                        return null;
+                }
+                catch (Exception ex)
+                {
+                    Debug.Write("Erreur lors de la récupération du DeviceInformation. \n" + ex.Message);
+                }
 
                 // Make a processor which will pull frames from the camera and run
                 frameProcessor = new WordFrameProcessor(requestWord, mediaFrameSourceFinder, videoCaptureDevice, MediaEncodingSubtypes.Bgra8);
@@ -51,6 +65,7 @@ namespace MediaFrameQrProcessing.Wrappers
 
             catch (Exception e)
             {
+                Debug.Write("Erreur lors de la récupération du frame processor. \n" + e.Message);
             }
             return frameProcessor;
         }
@@ -64,15 +79,22 @@ namespace MediaFrameQrProcessing.Wrappers
         public static async void ScanFirstCameraForWords(Action<List<ActiDetectedWord>> resultCallback, TimeSpan timeout, string requestWord)
         {
             List<ActiDetectedWord> result = new List<ActiDetectedWord>();
-
-            if (m_FrameProcessor == null)
-                m_FrameProcessor = await GetFrameProcessor(requestWord);
-
-            if (m_FrameProcessor != null)
+            try
             {
-                // Process frames for up to 30 seconds to see if we get any words...
-                await m_FrameProcessor.ProcessFramesAsync(timeout);
-                result = m_FrameProcessor.Result;
+
+                if (m_FrameProcessor == null)
+                    m_FrameProcessor = await GetFrameProcessor(requestWord);
+
+                if (m_FrameProcessor != null)
+                {
+                    // Process frames for up to 30 seconds to see if we get any words...
+                    await m_FrameProcessor.ProcessFramesAsync(timeout);
+                    result = m_FrameProcessor.Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Write("Erreur lors du scan de la webcam. " + ex.Message);
             }
             // Call back with whatever result we got.
             resultCallback(result);

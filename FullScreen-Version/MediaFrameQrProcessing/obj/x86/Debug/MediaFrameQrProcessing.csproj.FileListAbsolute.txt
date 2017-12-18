@@ -1,0 +1,17 @@
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\x86\Debug\MediaFrameQrProcessing.dll
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\x86\Debug\MediaFrameQrProcessing.pdb
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\x86\Debug\MediaFrameQrProcessing.pri
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\MediaFrameQrProcessing.csproj.CoreCompileInputs.cache
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\MediaFrameQrProcessing.dll
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\MediaFrameQrProcessing.pdb
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\priconfig.xml
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\priconfig.xml.intermediate
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\layout.resfiles
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\layout.resfiles.intermediate
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\resources.resfiles
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\resources.resfiles.intermediate
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\pri.resfiles
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\pri.resfiles.intermediate
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\qualifiers.txt
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\qualifiers.txt.intermediate
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\x86\Debug\MultipleQualifiersPerDimensionFound.txt

@@ -19,7 +19,6 @@ E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\ProjetCourant
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\Debug\MediaFrameQrProcessing.dll
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\Debug\MediaFrameQrProcessing.pdb
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\bin\Debug\MediaFrameQrProcessing.pri
-E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MediaFrameQrProcessing.csprojResolveAssemblyReference.cache
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MediaFrameQrProcessing.csproj.CoreCompileInputs.cache
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MediaFrameQrProcessing.dll
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MediaFrameQrProcessing.pdb

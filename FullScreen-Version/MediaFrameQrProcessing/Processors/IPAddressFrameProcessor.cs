@@ -1,7 +1,6 @@
 ﻿namespace MediaFrameQrProcessing.Processors
 {
     using MediaFrameQrProcessing.VideoDeviceFinders;
-    using System.Runtime.InteropServices.WindowsRuntime;
     using System.Threading.Tasks;
     using Windows.Devices.Enumeration;
     using Windows.Media.Capture;
@@ -10,6 +9,7 @@
     using System;
     using System.Text.RegularExpressions;
     using System.Net;
+    using System.Diagnostics;
 
     public class IPAddressFrameProcessor : MediaCaptureFrameProcessor
     {
@@ -61,8 +61,9 @@
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Debug.Write("Erreur lors de la récupération de l'adresse IP. " + ex.Message);
                 }
             }
             return (done);

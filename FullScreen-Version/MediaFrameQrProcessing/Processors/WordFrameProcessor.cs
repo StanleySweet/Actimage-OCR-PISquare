@@ -1,17 +1,18 @@
-﻿using MediaFrameQrProcessing.VideoDeviceFinders;
-using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Graphics.Imaging;
-using Windows.Media.Capture.Frames;
-using Windows.Media.Ocr;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Windows.Media.Capture;
-using MediaFrameQrProcessing.Entities;
-
-namespace MediaFrameQrProcessing.Processors
+﻿namespace MediaFrameQrProcessing.Processors
 {
+    using MediaFrameQrProcessing.VideoDeviceFinders;
+    using System.Threading.Tasks;
+    using Windows.Devices.Enumeration;
+    using Windows.Graphics.Imaging;
+    using Windows.Media.Capture.Frames;
+    using Windows.Media.Ocr;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Windows.Media.Capture;
+    using MediaFrameQrProcessing.Entities;
+    using System.Diagnostics;
+
     public class WordFrameProcessor : MediaCaptureFrameProcessor
     {
         public List<ActiDetectedWord> Result { get; private set; }
@@ -21,6 +22,7 @@ namespace MediaFrameQrProcessing.Processors
         public WordFrameProcessor(string requestWord, MediaFrameSourceFinder mediaFrameSourceFinder, DeviceInformation videoDeviceInformation, string mediaEncodingSubtype, MediaCaptureMemoryPreference memoryPreference = MediaCaptureMemoryPreference.Cpu)
         : base(mediaFrameSourceFinder, videoDeviceInformation, mediaEncodingSubtype, memoryPreference)
         {
+            Result = new List<ActiDetectedWord>();
             this.m_RequestWord = requestWord;
         }
 
@@ -45,34 +47,23 @@ namespace MediaFrameQrProcessing.Processors
                     {
                         foreach (OcrWord word in line.Words)
                         {
-                            if (word.Text.Contains(m_RequestWord))
+                            if (word.Text.ToLower().Contains(m_RequestWord))
                                 Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                            else if (LevenshteinDistance.Compute(m_RequestWord, word.Text) <= 2)
+                            else if (LevenshteinDistance.Compute(m_RequestWord.ToLower(), word.Text.ToLower()) <= 2)
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
+                            else if("quarante deux".Equals(m_RequestWord.ToLower()))
                                 Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
                         }
                     }
 
                     return Result.Count > 0;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Debug.Write("Erreur lors de la récupération du mot. " + ex.Message);
                 }
             }
             return false;
-        }
-
-        private IEnumerable<string> FindSimilarWords(string entry, string requestWord)
-        {
-            IEnumerable<string> words = entry.Split(' ').ToList();
-
-            //Pick only the words with the same length.
-            words = words.Where(w => w.Length == requestWord.Length);
-
-            // Can't use the distance calculation if the word is too short
-            if(requestWord.Length > 4)
-                words = words.Where(w => LevenshteinDistance.Compute(w, requestWord) <= 2);
-
-            return words;
         }
     }
 }

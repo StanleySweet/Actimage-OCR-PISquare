@@ -39,7 +39,7 @@
     public static bool ColorVideoPreviewFilter(MediaFrameSourceInfo sourceInfo)
     {
       return (
-        (sourceInfo.MediaStreamType == MediaStreamType.VideoPreview) &&
+        (sourceInfo.MediaStreamType == MediaStreamType.VideoRecord) &&
         (sourceInfo.SourceKind == MediaFrameSourceKind.Color));
     }
   }
