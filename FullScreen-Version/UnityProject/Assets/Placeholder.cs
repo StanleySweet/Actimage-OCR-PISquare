@@ -7,12 +7,8 @@
     using UnityEngine.Windows.Speech;
 
 #if !UNITY_EDITOR
-    using HoloToolkit.Unity.InputModule;
-    using System.Threading;
-    using Windows.Media.MediaProperties;
     using MediaFrameQrProcessing.Wrappers;
     using MediaFrameQrProcessing.Entities;
-    using Windows.Media.Ocr;
     using System.Linq;
 #endif
     public class Placeholder : MonoBehaviour
