@@ -61,7 +61,7 @@
 
             this.m_DictationRecognizer.DictationComplete += (completionCause) =>
             {
-                if (completionCause != DictationCompletionCause.Complete)
+                if (!completionCause.Equals(DictationCompletionCause.Complete))
                     Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
             };
 
@@ -72,31 +72,30 @@
         }
         public void Scan(string text)
         {
-            if(!this.m_Searching && Constants.SEARCH_KEYWORD.Equals(text))
+            if (!this.m_Searching && Constants.SEARCH_KEYWORD.Equals(text))
             {
                 PromptForSearchWord();
                 return;
             }
 
-            if (this.m_Searching)
+
+            if (!this.m_Validated)
             {
-                if (!this.m_Validated)
-                {
-                    if (!Constants.VALIDATION_TEXT.Equals(text))
-                        this.m_WordToSearch = text;
+                if (!Constants.VALIDATION_TEXT.Equals(text))
+                    this.m_WordToSearch = text;
 
-                    this.m_TextMesh.text = "Le mot à rechercher est " + this.m_WordToSearch + " \n dites 'valider' pour continuer";
-                }
-
-                if (Constants.VALIDATION_TEXT.Equals(text))
-                    ValidateSearch();
-
-                if (this.m_Validated && !this.m_StartedRecognition)
-                    StartRecognition();
-
-                if (Constants.STOP_TEXT.Equals(text) || TimeoutExceeded())
-                    Reset();
+                this.m_TextMesh.text = "Le mot à rechercher est " + this.m_WordToSearch + " \n dites 'valider' pour continuer";
             }
+
+            if (Constants.VALIDATION_TEXT.Equals(text))
+                ValidateSearch();
+
+            if (this.m_Validated && !this.m_StartedRecognition)
+                StartRecognition();
+
+            if (Constants.STOP_TEXT.Equals(text) || TimeoutExceeded())
+                Reset();
+
         }
 
         private void ValidateSearch()

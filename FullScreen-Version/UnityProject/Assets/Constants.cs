@@ -11,5 +11,6 @@ namespace Assets
         public static String STOP_TEXT = "stop";
         public static String SEARCH_KEYWORD = "rechercher";
         public static Int32 TIMEOUT = 30;
+        public static Boolean DEBUG = true;
     }
 }
