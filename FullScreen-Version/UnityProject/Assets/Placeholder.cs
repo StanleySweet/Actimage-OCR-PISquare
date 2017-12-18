@@ -227,12 +227,12 @@
         private List<Rect> DrawRectOutlines(Rect rectangle, int borderWidth)
         {
             var rectangles = new List<Rect>()
-        {
-            new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
-            new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
-            new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
-            new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
-        };
+            {
+                new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
+                new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
+                new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
+                new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
+            };
             return rectangles;
         }
         private IEnumerator DelaySeconds(int seconds)
