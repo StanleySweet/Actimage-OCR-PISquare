@@ -1,17 +1,16 @@
 ﻿namespace MediaFrameQrProcessing.Processors
 {
+    using MediaFrameQrProcessing.Entities;
     using MediaFrameQrProcessing.VideoDeviceFinders;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Threading.Tasks;
     using Windows.Devices.Enumeration;
     using Windows.Graphics.Imaging;
+    using Windows.Media.Capture;
     using Windows.Media.Capture.Frames;
     using Windows.Media.Ocr;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Windows.Media.Capture;
-    using MediaFrameQrProcessing.Entities;
-    using System.Diagnostics;
 
     public class WordFrameProcessor : MediaCaptureFrameProcessor
     {

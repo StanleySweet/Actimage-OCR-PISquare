@@ -1,15 +1,15 @@
 ﻿namespace MediaFrameQrProcessing.Processors
 {
     using MediaFrameQrProcessing.VideoDeviceFinders;
+    using System;
+    using System.Diagnostics;
+    using System.Net;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Windows.Devices.Enumeration;
     using Windows.Media.Capture;
     using Windows.Media.Capture.Frames;
     using Windows.Media.Ocr;
-    using System;
-    using System.Text.RegularExpressions;
-    using System.Net;
-    using System.Diagnostics;
 
     public class IPAddressFrameProcessor : MediaCaptureFrameProcessor
     {
