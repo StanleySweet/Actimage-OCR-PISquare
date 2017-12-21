@@ -255,7 +255,7 @@ PlayerSettings:
   m_BuildTargetGraphicsAPIs: []
   m_BuildTargetVRSettings:
   - m_BuildTarget: Metro
-    m_Enabled: 0
+    m_Enabled: 1
     m_Devices:
     - HoloLens
   m_BuildTargetEnableVuforiaSettings: []
@@ -583,7 +583,7 @@ PlayerSettings:
       Proximity: False
       RemovableStorage: False
       SharedUserCertificates: False
-      SpatialPerception: False
+      SpatialPerception: True
       UserAccountInformation: False
       VideosLibrary: False
       VoipCall: False

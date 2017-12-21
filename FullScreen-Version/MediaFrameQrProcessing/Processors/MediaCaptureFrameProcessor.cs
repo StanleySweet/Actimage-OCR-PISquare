@@ -43,43 +43,37 @@
             // and instead of creating/disposing an instance each time one instance is kept
             // indefinitely.
             // It's not what I wanted...
-            await Task.Run(
-              async () =>
-              {
-                  var startTime = DateTime.Now;
+            await Task.Run(async () =>
+            {
+                var startTime = DateTime.Now;
 
-                  if (this.mediaCapture == null)
-                  {
-                      this.mediaCapture = await this.CreateMediaCaptureAsync();
-                  }
-                  var mediaFrameSource = this.mediaCapture.FrameSources[
-              this.mediaFrameSourceFinder.FrameSourceInfo.Id];
+                if (this.mediaCapture == null)
+                    this.mediaCapture = await this.CreateMediaCaptureAsync();
 
-                  using (var frameReader =
-              await this.mediaCapture.CreateFrameReaderAsync(
-                mediaFrameSource, this.mediaEncodingSubtype))
-                  {
-                      bool done = false;
+                var mediaFrameSource = this.mediaCapture.FrameSources[this.mediaFrameSourceFinder.FrameSourceInfo.Id];
+                using (var frameReader = await this.mediaCapture.CreateFrameReaderAsync(mediaFrameSource, this.mediaEncodingSubtype))
+                {
+                    bool done = false;
 
-                      await frameReader.StartAsync();
+                    await frameReader.StartAsync();
 
-                      while (!done)
-                      {
-                          using (var frame = frameReader.TryAcquireLatestFrame())
-                          {
-                              if (frame != null)
-                              {
-                                  done = await this.ProcessFrameAsync(frame);
-                              }
-                          }
-                          if (!done)
-                          {
-                              done = (DateTime.Now - startTime) > timeout;
-                          }
-                      }
-                      await frameReader.StopAsync();
-                  }
-              }
+                    while (!done)
+                    {
+                        using (var frame = frameReader.TryAcquireLatestFrame())
+                        {
+                            if (frame != null)
+                            {
+                                done = await this.ProcessFrameAsync(frame);
+                            }
+                        }
+                        if (!done)
+                        {
+                            done = (DateTime.Now - startTime) > timeout;
+                        }
+                    }
+                    await frameReader.StopAsync();
+                }
+            }
             );
         }
         async Task<MediaCapture> CreateMediaCaptureAsync()
