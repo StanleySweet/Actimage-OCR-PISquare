@@ -6,13 +6,13 @@
     using UnityEngine;
     using UnityEngine.Windows.Speech;
     using UnityEngine.XR;
+    using System.Threading.Tasks;
+    using System.Threading;
 
 #if !UNITY_EDITOR
     using MediaFrameQrProcessing.Wrappers;
     using MediaFrameQrProcessing.Entities;
     using System.Linq;
-    using System.Threading.Tasks;
-    using System.Threading;
 
 #endif
     public class Placeholder : MonoBehaviour
@@ -81,10 +81,12 @@
                         if (!this.m_StartedRecognition)
                         {
                             this.m_StartedRecognition = true;
+                            #if !UNITY_EDITOR
                             Task.Factory.StartNew(() =>
                             {
                                 WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals("42") ? Constants.WILDCARD : this.m_WordToSearch);
                             });
+                            #endif
                         }
                     }
                 }
@@ -210,7 +212,7 @@
 
         }
 
-        #region Debug
+#region Debug
 
         private void DisableVirtualReality()
         {
@@ -223,10 +225,10 @@
             yield return null;
             XRSettings.enabled = enable;
         }
-        #endregion
+#endregion
 
 
-        #region Utils
+#region Utils
         private void DisablePhraseRecognitionSystem()
         {
             if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
@@ -305,6 +307,6 @@
         {
             yield return new WaitForSeconds(seconds);
         }
-       #endregion
+#endregion
     }
 }
