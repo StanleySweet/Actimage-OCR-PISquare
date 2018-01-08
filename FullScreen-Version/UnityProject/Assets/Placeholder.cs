@@ -28,7 +28,7 @@
         private List<Color> m_Colors;
         #endregion
 
-        private void Start()
+        public void Start()
         {
             // Important : If this is not disabled dictation recognizer will 
             // not start
@@ -69,6 +69,8 @@
             if (!this.m_Searching && Constants.SEARCH_KEYWORD.Equals(text))
             {
                 AskForSearchWord();
+                m_Rectangles.Clear();
+                m_Colors.Clear();
             }
             else if (this.m_Searching)
             {
@@ -139,8 +141,6 @@
             {
                 this.m_TextMesh.text = string.Format("Dites '{0}' pour commencer", Constants.SEARCH_KEYWORD);
             }
-
-
         }
 #if !UNITY_EDITOR
         public void GetWordsBoundingBoxes(List<ActiDetectedWord> result)
@@ -181,7 +181,10 @@
 
         private void DisplayWebcamPreview()
         {
-            DisplayWebcam.tex.Play();
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                DisplayWebcam.tex.Play();
+            }, false);        
         }
 
         /// <summary>
