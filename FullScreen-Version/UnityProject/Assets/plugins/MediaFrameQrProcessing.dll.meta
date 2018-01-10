@@ -108,7 +108,7 @@ PluginImporter:
         DontProcess: True
         PlaceholderPath: 
         SDK: UWP
-        ScriptingBackend: AnyScriptingBackend
+        ScriptingBackend: DotNet
   userData: 
   assetBundleName: 
   assetBundleVariant: 

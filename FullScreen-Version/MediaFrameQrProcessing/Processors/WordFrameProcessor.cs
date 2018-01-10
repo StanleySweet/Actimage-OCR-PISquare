@@ -45,18 +45,18 @@
 
                         if (ocrResult == null)
                             throw new Exception("Ocr Result is null");
-  
-                            foreach (OcrWord word in ocrResult.Lines.SelectMany(l => l.Words).ToList())
-                            {
-                                if ("quarante deux".Equals(m_RequestWord.ToLower()))
-                                    Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
-                                else if (word.Text.ToLower().Contains(m_RequestWord))
-                                    Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                                else if (LevenshteinDistance.Compute(m_RequestWord.ToLower(), word.Text.ToLower()) <= 2)
-                                    Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
 
-                            }
-  
+                        foreach (OcrWord word in ocrResult.Lines.SelectMany(l => l.Words).ToList())
+                        {
+                            if ("quarante deux".Equals(m_RequestWord.ToLower()))
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
+                            else if (word.Text.ToLower().Contains(m_RequestWord))
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
+                            else if (LevenshteinDistance.Compute(m_RequestWord.ToLower(), word.Text.ToLower()) <= 2)
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
+
+                        }
+
 
                         success = Result.Count > 0;
                     }

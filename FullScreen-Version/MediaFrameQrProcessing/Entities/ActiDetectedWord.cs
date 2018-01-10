@@ -18,6 +18,7 @@
             _width = width;
             _exactMatch = exactMatch;
         }
+        public string DetectedWord => _originalText;
         public bool IsExactMatch() => _exactMatch;
         public float PosX => (float)_posX;
         public float PosY => (float)_posY;

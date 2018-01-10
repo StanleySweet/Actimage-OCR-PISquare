@@ -7,16 +7,13 @@
     using UnityEngine.Windows.Speech;
     using UnityEngine.XR;
     using System.Threading.Tasks;
-    using System.Threading;
-    using System.Linq;
 
 #if !UNITY_EDITOR
+    using MediaFrameQrProcessing;
     using MediaFrameQrProcessing.Wrappers;
     using MediaFrameQrProcessing.Entities;
-    using OCR_Library;
-    using Windows.Media.Capture;
-
-
+    using System.Threading;
+    using System.Linq;
 #endif
     public class Placeholder : MonoBehaviour
     {
@@ -65,7 +62,6 @@
                 this.m_DictationRecognizer.Start();
 
             Microphone.IsRecording(string.Empty);
-
         }
 
         void Update()
@@ -101,6 +97,7 @@
                                 //stopwatch.Start();
                                 //while (stopwatch.Elapsed.Seconds < 10)
                                 //{
+                                Debug.LogFormat(text + "," + m_WordToSearch);
                                 WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals("42") ? Constants.WILDCARD : this.m_WordToSearch);
                                 DelaySeconds(5);
                                 //}
@@ -135,7 +132,6 @@
                 Reset();
         }
 
-
         /// <summary>
         /// This function is called on start and each time the users stop the application
         /// The aim is to switch between the different voices recognition systems.
@@ -160,6 +156,7 @@
             this.m_Validated = false;
             this.m_Searching = false;
             this.m_StartedRecognition = false;
+            this.m_WordToSearch = string.Empty;
 
             if (!mainThread)
             {
@@ -176,6 +173,9 @@
 #if !UNITY_EDITOR
         public void GetWordsBoundingBoxes(List<ActiDetectedWord> result)
         {
+            foreach (var word in result)
+                Debug.Log(word.DetectedWord);
+
             String resultStatistics = String.Empty;
             try
             {
