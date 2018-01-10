@@ -19,7 +19,6 @@ namespace Assets
                 rend = this.GetComponentInChildren<Renderer>();
                 rend.enabled = false;
             }
-
         }
 
         private void DisplayWebcamPreview()
@@ -29,14 +28,6 @@ namespace Assets
             tex = new WebCamTexture(devices[0].name);
             rend.material.mainTexture = tex;
             tex.Play();
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-
         }
     }
 }

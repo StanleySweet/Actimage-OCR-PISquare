@@ -230,6 +230,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1977527632}
+  - {fileID: 637750001}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -324,12 +325,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 637749996}
-  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0.7071068, w: 0}
   m_LocalPosition: {x: 0.024, y: -0.077, z: 2.009}
-  m_LocalScale: {x: 0.046999987, y: 0.02, z: 0.03749999}
+  m_LocalScale: {x: 0.047000032, y: 1, z: 0.037500005}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_Father: {fileID: 401017178}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 90, z: -90}
 --- !u!1001 &1756019924
 Prefab:
@@ -373,7 +374,7 @@ Prefab:
     - target: {fileID: 102000010767390410, guid: e121ae2e4d95a3848b67d66fd7159756,
         type: 2}
       propertyPath: m_Text
-      value: 
+      value: Placeholder Text
       objectReference: {fileID: 0}
     - target: {fileID: 1000013198843976, guid: e121ae2e4d95a3848b67d66fd7159756, type: 2}
       propertyPath: m_StaticEditorFlags

@@ -25729,21 +25729,26 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dolci\\.nuget\\packages\\": {}
+    "C:\\Users\\dolci\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\users\\dolci\\source\\repos\\OCR-Library\\OCR-Library\\OCR-Library.csproj",
+      "projectUniqueName": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\OCR_UWP_Library\\OCR-Library\\OCR-Library.csproj",
       "projectName": "OCR-Library",
-      "projectPath": "c:\\users\\dolci\\source\\repos\\OCR-Library\\OCR-Library\\OCR-Library.csproj",
+      "projectPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\OCR_UWP_Library\\OCR-Library\\OCR-Library.csproj",
       "packagesPath": "C:\\Users\\dolci\\.nuget\\packages\\",
-      "outputPath": "c:\\users\\dolci\\source\\repos\\OCR-Library\\OCR-Library\\obj\\",
+      "outputPath": "E:\\Users\\dolci\\Documents\\ESILV\\PI² A5\\Repos\\Actimage-OCR-PISquare\\FullScreen-Version\\OCR_UWP_Library\\OCR-Library\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\"
+      ],
       "configFilePaths": [
         "C:\\Users\\dolci\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "originalTargetFrameworks": [
         "uap10.0.10586"
@@ -25763,7 +25768,7 @@
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": {
             "target": "Package",
-            "version": "6.0.1"
+            "version": "[6.0.1, )"
           }
         }
       }

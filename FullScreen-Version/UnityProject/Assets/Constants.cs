@@ -10,7 +10,7 @@
         public static String STOP_TEXT = "stop";
         public static String WILDCARD = "quarante deux";
         public static String SEARCH_KEYWORD = "rechercher";
-        public static Double TIMEOUT = 10;
+        public static Double TIMEOUT = 5;
         public static Boolean DEBUG = true;
     }
 }

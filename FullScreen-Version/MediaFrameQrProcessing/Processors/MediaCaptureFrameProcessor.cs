@@ -43,6 +43,20 @@
             // and instead of creating/disposing an instance each time one instance is kept
             // indefinitely.
             // It's not what I wanted...
+
+            //if (this.mediaCapture == null)
+            //    this.mediaCapture = await this.CreateMediaCaptureAsync();
+
+            //var mediaFrameSource = this.mediaCapture.FrameSources[this.mediaFrameSourceFinder.FrameSourceInfo.Id];
+            //using (var frameReader = await this.mediaCapture.CreateFrameReaderAsync(mediaFrameSource, this.mediaEncodingSubtype))
+            //{
+            //    await frameReader.StartAsync();
+            //    await this.ProcessFrameAsync(frameReader.TryAcquireLatestFrame());
+
+            //}
+
+
+
             await Task.Run(async () =>
             {
                 var startTime = DateTime.Now;

@@ -8,17 +8,21 @@
     using UnityEngine.XR;
     using System.Threading.Tasks;
     using System.Threading;
+    using System.Linq;
 
 #if !UNITY_EDITOR
     using MediaFrameQrProcessing.Wrappers;
     using MediaFrameQrProcessing.Entities;
-    using System.Linq;
+    using OCR_Library;
+    using Windows.Media.Capture;
+
 
 #endif
     public class Placeholder : MonoBehaviour
     {
         #region Attributes
         private TextMesh m_TextMesh;
+        private Transform m_PlaneMesh;
         private DictationRecognizer m_DictationRecognizer;
         private Boolean m_Searching;
         private Boolean m_Validated;
@@ -34,8 +38,17 @@
             // not start
             // VR Causes issues on local windows.
             if (Constants.DEBUG)
+            {
+                var transforms = GetComponentsInChildren<Transform>();
+                foreach (var transform in transforms)
+                {
+                    if (transform.name.Equals("Plane"))
+                        m_PlaneMesh = transform;
+                }
                 DisableVirtualReality();
-            this.DisablePhraseRecognitionSystem();
+            }
+
+
             this.m_TextMesh = GetComponentInChildren<TextMesh>();
             this.m_Searching = false;
             this.m_Validated = false;
@@ -43,21 +56,17 @@
             this.m_StartedRecognition = false;
             this.m_Rectangles = new List<Rect>();
             this.m_Colors = new List<Color>();
-            this.InitDictationRecognizer();
             this.Reset();
+            this.DisablePhraseRecognitionSystem();
 
-            if (SpeechSystemStatus.Stopped.Equals(this.m_DictationRecognizer.Status))
+            this.m_DictationRecognizer = null;
+            this.InitDictationRecognizer();
+            if (SpeechSystemStatus.Stopped == this.m_DictationRecognizer.Status)
                 this.m_DictationRecognizer.Start();
-        }
 
-        //Rect ScaleBoxToCanvas(Rect boundingRect)
-        //{
-        //    float x = (boundingRect.x / (double)this.videoProperties.Width) * this.drawCanvas.ActualWidth;
-        //    float y = (boundingRect.y / (double)this.videoProperties.Height) * this.drawCanvas.ActualHeight;
-        //    float width = (boundingRect.width / (double)this.videoProperties.Width) * this.drawCanvas.ActualWidth;
-        //    float height = (boundingRect.height / (double)this.videoProperties.Height) * this.drawCanvas.ActualHeight;
-        //    return (new Rect(x, y, width, height));
-        //}
+            Microphone.IsRecording(string.Empty);
+
+        }
 
         void Update()
         {
@@ -77,18 +86,39 @@
 
                 if (Constants.VALIDATION_TEXT.Equals(text) && !String.IsNullOrEmpty(m_WordToSearch))
                 {
-                    ValidateSearch();
+                    if (!this.m_StartedRecognition)
+                        ValidateSearch();
+
                     if (this.m_Validated)
                     {
                         if (!this.m_StartedRecognition)
                         {
                             this.m_StartedRecognition = true;
-                            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
                             Task.Factory.StartNew(() =>
                             {
+                                //var stopwatch = new System.Diagnostics.Stopwatch();
+                                //stopwatch.Start();
+                                //while (stopwatch.Elapsed.Seconds < 10)
+                                //{
                                 WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals("42") ? Constants.WILDCARD : this.m_WordToSearch);
+                                DelaySeconds(5);
+                                //}
+
+                                Reset(false);
+                                DisplayWebcamPreview();
                             });
-                            #endif
+
+#endif
+                        }
+                        if (Constants.STOP_TEXT.Equals(text) && this.m_StartedRecognition)
+                        {
+                            Task.Factory.StartNew(() =>
+                            {
+                                DelaySeconds(5);
+                                Reset(false);
+                                DisplayWebcamPreview();
+                            });
                         }
                     }
                 }
@@ -104,6 +134,7 @@
             if (Constants.STOP_TEXT.Equals(text))
                 Reset();
         }
+
 
         /// <summary>
         /// This function is called on start and each time the users stop the application
@@ -169,13 +200,6 @@
             {
                 this.m_TextMesh.text = resultStatistics;
             }, false);
-
-            Task.Factory.StartNew(() =>
-            {
-                DelaySeconds(5);
-                Reset(false);
-                DisplayWebcamPreview();
-            });
         }
 #endif
 
@@ -184,7 +208,7 @@
             UnityEngine.WSA.Application.InvokeOnAppThread(() =>
             {
                 DisplayWebcam.tex.Play();
-            }, false);        
+            }, false);
         }
 
         /// <summary>
@@ -203,9 +227,9 @@
             {
                 for (Int16 j = 0; j < m_Rectangles.Count; ++j)
                 {
-                    var borderRectangles = DrawRectOutlines(m_Rectangles[j], 2);
+                    var borderRectangles = GetRectOutlines(m_Rectangles[j], 2);
                     foreach (var borderRectangle in borderRectangles)
-                        GUI.DrawTexture(borderRectangle, Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, m_Colors[j], 2, 5);
+                        GUI.DrawTexture(borderRectangle, Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, m_Colors[j], 2, 0);
                 }
             }
             catch (Exception ex)
@@ -215,7 +239,7 @@
 
         }
 
-#region Debug
+        #region Debug
 
         private void DisableVirtualReality()
         {
@@ -228,10 +252,10 @@
             yield return null;
             XRSettings.enabled = enable;
         }
-#endregion
+        #endregion
 
 
-#region Utils
+        #region Utils
         private void DisablePhraseRecognitionSystem()
         {
             if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
@@ -239,6 +263,7 @@
         }
         private void InitDictationRecognizer()
         {
+            m_DictationRecognizer?.Dispose();
             m_DictationRecognizer = new DictationRecognizer()
             {
                 AutoSilenceTimeoutSeconds = -1,
@@ -261,7 +286,7 @@
                 {
                     Debug.LogErrorFormat("Dictation completed unsuccessfully: {0}.", completionCause);
                     this.m_DictationRecognizer.Dispose();
-                    InitDictationRecognizer();
+                    this.InitDictationRecognizer();
                     Reset();
                 }
             };
@@ -295,21 +320,57 @@
         /// <param name="borderWidth"></param>
         /// <returns></returns>
 
-        private List<Rect> DrawRectOutlines(Rect rectangle, int borderWidth)
+        private List<Rect> GetRectOutlines(Rect rectangle, int borderWidth)
         {
-            var rectangles = new List<Rect>()
-            {
-                new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
-                new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
-                new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
-                new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
-            };
+            List<Rect> rectangles = null;
+            float fixedPlaneWidth = 0.04700003F;
+            float fixedPlaneHeight = 0.03750001F;
+            int webcamHeight = DisplayWebcam.tex.height;
+            int webcamWidth = DisplayWebcam.tex.width;
+            int screenWidth = Screen.width;
+            int screenHeight = Screen.height;
+
+            fixedPlaneWidth = 0.04700003F * screenHeight;
+            fixedPlaneHeight = 0.03750001F * screenWidth;
+            var position = new Vector3(m_PlaneMesh.position.x, m_PlaneMesh.position.y, m_PlaneMesh.localPosition.z);
+
+
+            double horizontalRatio = screenWidth / webcamWidth;
+            double verticalRatio = screenHeight / webcamHeight;
+            float rectangleX = (float)(rectangle.x * horizontalRatio);
+            float rectangleY = (float)(rectangle.y * verticalRatio);
+            float rectangleWidth = (float)(rectangle.width * horizontalRatio);
+            float rectangleHeight = (float)(rectangle.height * verticalRatio);
+            float borderWidthHeight = (float)(borderWidth * verticalRatio);
+            float borderWidthWidth = (float)(borderWidth * horizontalRatio);
+
+            if (Constants.DEBUG)
+                rectangles = new List<Rect>()
+                {
+                    // Top Rectangle
+                    new Rect(rectangleX, rectangleY, rectangleWidth, borderWidthHeight),
+                    // Bottom Rectangle
+                    new Rect(rectangleX, rectangleY + rectangleHeight - borderWidthHeight, rectangleWidth, borderWidthHeight),
+                    // Right Rectangle
+                    new Rect(rectangleX + rectangleWidth - borderWidthWidth, rectangleY + borderWidthHeight, borderWidthWidth, rectangleHeight - (borderWidthHeight * 2)),
+                    // Left Rectangle
+                    new Rect(rectangleX, rectangleY + borderWidthWidth, borderWidthWidth, rectangleHeight - (borderWidthHeight * 2))
+                };
+            else
+                rectangles = new List<Rect>()
+                {
+                    new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
+                    new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
+                    new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
+                    new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
+                };
+
             return rectangles;
         }
         private IEnumerator DelaySeconds(float seconds)
         {
             yield return new WaitForSeconds(seconds);
         }
-#endregion
+        #endregion
     }
 }
