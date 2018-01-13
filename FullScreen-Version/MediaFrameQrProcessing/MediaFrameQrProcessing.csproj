@@ -110,9 +110,11 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Decoders\ZxingQRCodeDecoder.cs" />
     <Compile Include="Entities\ActiDetectedWord.cs" />
     <Compile Include="Math\LevenshteinDistance.cs" />
     <Compile Include="Processors\MediaCaptureFrameProcessor.cs" />
+    <Compile Include="Processors\QrCaptureFrameProcessor.cs" />
     <Compile Include="Processors\WordFrameProcessor.cs" />
     <Compile Include="VideoDeviceFinders\MediaFrameSourceFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +122,7 @@
     <Compile Include="Wrappers\IPAddressScanner.cs" />
     <Compile Include="VideoDeviceFinders\VideoCaptureDeviceFinder.cs" />
     <Compile Include="Wrappers\WordScanner.cs" />
+    <Compile Include="Wrappers\ZXingQrCodeScanner.cs" />
     <EmbeddedResource Include="Properties\MediaFrameQrProcessing.rd.xml" />
   </ItemGroup>
   <ItemGroup>

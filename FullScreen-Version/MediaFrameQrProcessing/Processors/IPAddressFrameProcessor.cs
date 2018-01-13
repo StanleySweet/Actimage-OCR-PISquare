@@ -15,19 +15,11 @@
     {
         public IPAddress Result { get; private set; }
 
-        public IPAddressFrameProcessor(
-          MediaFrameSourceFinder mediaFrameSourceFinder,
-          DeviceInformation videoDeviceInformation,
-          string mediaEncodingSubtype,
-          MediaCaptureMemoryPreference memoryPreference = MediaCaptureMemoryPreference.Cpu)
-
-          : base(
-              mediaFrameSourceFinder,
-              videoDeviceInformation,
-              mediaEncodingSubtype,
-              memoryPreference)
+        public IPAddressFrameProcessor(MediaFrameSourceFinder mediaFrameSourceFinder, DeviceInformation videoDeviceInformation, string mediaEncodingSubtype, MediaCaptureMemoryPreference memoryPreference = MediaCaptureMemoryPreference.Cpu) : base(mediaFrameSourceFinder, videoDeviceInformation, mediaEncodingSubtype, memoryPreference)
         {
+            this.Result = null;
         }
+
         protected override async Task<bool> ProcessFrameAsync(MediaFrameReference frameReference)
         {
             bool done = false;

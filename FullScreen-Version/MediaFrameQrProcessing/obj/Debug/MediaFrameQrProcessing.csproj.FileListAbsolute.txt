@@ -33,3 +33,4 @@ E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Ve
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\qualifiers.txt
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\qualifiers.txt.intermediate
 E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MultipleQualifiersPerDimensionFound.txt
+E:\Users\dolci\Documents\ESILV\PI² A5\Repos\Actimage-OCR-PISquare\FullScreen-Version\MediaFrameQrProcessing\obj\Debug\MediaFrameQrProcessing.csprojResolveAssemblyReference.cache
