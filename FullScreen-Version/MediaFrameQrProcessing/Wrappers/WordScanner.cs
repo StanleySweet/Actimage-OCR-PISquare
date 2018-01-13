@@ -63,14 +63,28 @@
             }
             if (m_FrameProcessor != null)
             {
-                // Process frames for up to 30 seconds to see if we get any QR codes...
-                await m_FrameProcessor.ProcessFramesAsync(timeout);
+                DateTime startTime = DateTime.Now;
+                Boolean done = false;
+                TimeSpan currentTimeout = timeout;
 
-                // See what result we got.
-                result = m_FrameProcessor.Result;
+                // Process frames for up to 30 seconds to see if we get any Words...
+                // every frame that return something will bring us
+                // back in this loop. so we call the call back to display what we found.
+                // and we continue iterating until all time has run out.
+                while (!done)
+                {
+                    // Get data from the frames 
+                    await m_FrameProcessor.ProcessFramesAsync(currentTimeout);
+                    // See what result we got.
+                    result = m_FrameProcessor.Result;
+                    // Call back with whatever result we got.
+                    resultCallback(result);
+                    // If we timed out just leave.
+                    done = (DateTime.Now - startTime) > timeout;
+                    // Continue scanning with the time we have left
+                    currentTimeout = (DateTime.Now - startTime);
+                }
             }
-            // Call back with whatever result we got.
-            resultCallback(result);
         }
     }
 }

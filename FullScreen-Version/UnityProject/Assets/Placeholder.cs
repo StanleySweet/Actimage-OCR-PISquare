@@ -88,10 +88,16 @@
             this.InitDictationRecognizer();
         }
 
-            
+
         void Update()
         {
             Screen.fullScreen = true;
+        }
+
+        public void ClearLists()
+        {
+            this.m_Rectangles.Clear();
+            this.m_Colors.Clear();
         }
 
         public void Scan(string text)
@@ -100,8 +106,7 @@
             {
                 this.m_TextMesh.text = Constants.HOME_PROMPT;
                 this.m_Searching = true;
-                m_Rectangles.Clear();
-                m_Colors.Clear();
+                FunctionProxyOnMainThread(ClearLists);
             }
             else if (!this.m_Searching && Constants.QRCODE_KEYWORD.Equals(text))
             {
@@ -110,7 +115,10 @@
 #if !UNITY_EDITOR
                 try
                 {
-                    ZXingQrCodeScanner.ScanFirstCameraForQrCode(GetQRCode, TimeSpan.FromSeconds(Constants.TIMEOUT));
+                    Task.Factory.StartNew(() =>
+                    {
+                        ZXingQrCodeScanner.ScanFirstCameraForQrCode(GetQRCode, TimeSpan.FromSeconds(Constants.TIMEOUT));
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -137,19 +145,14 @@
 #if !UNITY_EDITOR
                             Task.Factory.StartNew(() =>
                             {
-
-                                DelaySecondProxy(() => {
-
-                                    Debug.LogFormat(text + "," + m_WordToSearch);
-                                    WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals("42") ? Constants.WILDCARD : this.m_WordToSearch);
-                                }, () =>
+                                WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals("42") ? Constants.WILDCARD : this.m_WordToSearch);
+                                DelaySecondProxy(() => { }, () =>
                                 {
-                                    Reset(false);
-                                    DisplayWebcamPreview();
-                                }, 5);
+                                    FunctionProxyOnMainThread(Reset);
+                                    FunctionProxyOnMainThread(DisplayWebcamPreview);
+                                }, (float) Constants.TIMEOUT);
 
                             });
-
 #endif
                         }
                         if (Constants.STOP_TEXT.Equals(text) && this.m_StartedRecognition)
@@ -158,7 +161,7 @@
                             {
                                 DelaySecondProxy(() => { }, () =>
                                 {
-                                    Reset(false);
+                                    Reset();
                                     DisplayWebcamPreview();
                                 }, 5);
 
@@ -183,23 +186,11 @@
         /// This function is called on start and each time the users stop the application
         /// The aim is to switch between the different voices recognition systems.
         /// </summary>
-        public void Reset(bool mainThread = true)
+        public void Reset()
         {
-
-
             DelaySecondProxy(() =>
             {
-                if (!mainThread)
-                {
-                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-                    {
-                        this.m_TextMesh.text = Constants.RESET_IN_PROGRESS;
-                    }, false);
-                }
-                else
-                {
-                    this.m_TextMesh.text = Constants.RESET_IN_PROGRESS;
-                }
+                this.m_TextMesh.text = Constants.RESET_IN_PROGRESS;
             }, () =>
             {
                 this.m_Decrypting = false;
@@ -208,21 +199,8 @@
                 this.m_StartedRecognition = false;
                 this.m_WordToSearch = string.Empty;
                 var sentence = string.Format("Dites '{0}' pour commencer \n ou '{1}' pour dechiffrer un QR corde", Constants.SEARCH_KEYWORD, Constants.QRCODE_KEYWORD);
-
-                if (!mainThread)
-                {
-                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-                    {
-                        this.m_TextMesh.text = sentence;
-                    }, false);
-                }
-                else
-                {
-                    this.m_TextMesh.text = sentence;
-                }
+                this.m_TextMesh.text = sentence;
             }, 0.1f);
-
-
         }
 
 
@@ -230,53 +208,45 @@
         public void GetQRCode(string result)
         {
             if (!string.IsNullOrEmpty(result))
-                this.m_TextMesh.text = result;
+                FunctionProxyOnMainThread(() => { this.m_TextMesh.text = result; });
             else
             {
-                this.m_TextMesh.text = Constants.NO_QR_CODE_FOUND;
-                Reset();
+                FunctionProxyOnMainThread(() =>
+                {
+                    this.m_TextMesh.text = Constants.NO_QR_CODE_FOUND;
+                    Reset();
+                });
             }
-
         }
 
-        public void GetWordsBoundingBoxes(List<ActiDetectedWord> result)
+        private void GetWordsBoundingBoxes(List<ActiDetectedWord> result)
         {
-            foreach (var word in result)
-                Debug.Log(word.DetectedWord);
-
             String resultStatistics = String.Empty;
             try
             {
-                m_Rectangles.Clear();
-                m_Colors.Clear();
+                FunctionProxyOnMainThread(ClearLists);
                 foreach (var resultat in result)
                 {
                     m_Rectangles.Add(new Rect(resultat.PosX, resultat.PosY, resultat.Width, resultat.Height));
                     m_Colors.Add(resultat.IsExactMatch() ? Constants.PERFECT_MATCH_COLOR : Constants.APPROXIMATE_MATCH_COLOR);
                 }
-
-                var numberOfExactMatches = result.Where(r => r.IsExactMatch()).Count();
-                resultStatistics = numberOfExactMatches + " exact match(es) were found. \n " + (result.Count - numberOfExactMatches) + " close match(es) were found. \n for the word";
+                UInt16 numberOfExactMatches = (UInt16)result.Where(r => r.IsExactMatch()).Count();
+                resultStatistics = numberOfExactMatches + " exact match(es) were found. \n " + (result.Count - numberOfExactMatches) + " close match(es) were found. \n for the word '" + this.m_WordToSearch + "'";
             }
             catch (Exception ex)
             {
                 print("Erreur lors de la recherche de mots" + ex.Message);
-                resultStatistics = string.Format("ERROR : 0 exact match(es) were found. 0 close match(es) were found for the word");
+                resultStatistics = Constants.ERROR_NO_RESULT_FOUND;
             }
 
-            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-            {
-                this.m_TextMesh.text = resultStatistics;
-            }, false);
+            FunctionProxyOnMainThread(() => { this.m_TextMesh.text = resultStatistics; });
         }
+
 #endif
 
         private void DisplayWebcamPreview()
         {
-            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-            {
-                DisplayWebcam.tex.Play();
-            }, false);
+            DisplayWebcam.tex.Play();
         }
 
         /// <summary>
@@ -307,9 +277,36 @@
 
         }
 
+
+        public void FunctionProxyOnMainThread(Action callback)
+        {
+            if (UnityEngine.WSA.Application.RunningOnAppThread())
+            {
+                callback();
+            }
+            else
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
+                    callback();
+                }, true);
+            }
+        }
+
+
         public void DelaySecondProxy(Action callback, Action callback2, float seconds)
         {
-            StartCoroutine(DelaySeconds(callback, callback2, seconds));
+            if (UnityEngine.WSA.Application.RunningOnAppThread())
+            {
+                StartCoroutine(DelaySeconds(callback, callback2, seconds));
+            }
+            else
+            {
+                UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                {
+                    StartCoroutine(DelaySeconds(callback, callback2, seconds));
+                }, false);
+            }
         }
 
         private IEnumerator DelaySeconds(Action callback, Action callback2, float seconds)

@@ -28,6 +28,7 @@
         protected override async Task<bool> ProcessFrameAsync(MediaFrameReference frameReference)
         {
             bool success = false;
+            Result?.Clear();
 
             await Task.Run(async () =>
             {

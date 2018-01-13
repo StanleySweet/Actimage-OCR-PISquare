@@ -6,7 +6,7 @@
     {
         public static Color PERFECT_MATCH_COLOR = Color.green;
         public static Color APPROXIMATE_MATCH_COLOR = Color.yellow;
-        public static String VALIDATION_TEXT = "valider";
+        public static String VALIDATION_TEXT = "okay";
         public static String STOP_TEXT = "stop";
         public static String WILDCARD = "quarante deux";
         public static String SEARCH_KEYWORD = "rechercher";
@@ -18,5 +18,6 @@
         public static String NO_QR_CODE_FOUND = "Aucun QR code trouvé, " + RESET_IN_PROGRESS;
         public static Double TIMEOUT = 5;
         public static Boolean DEBUG = true;
+        public static String ERROR_NO_RESULT_FOUND = "ERROR : 0 exact match(es) were found. 0 close match(es) were found for the word";
     }
 }
