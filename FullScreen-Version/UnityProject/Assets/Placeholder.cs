@@ -14,7 +14,6 @@
     using MediaFrameQrProcessing.Entities;
     using System.Threading;
     using System.Linq;
-    using AssemblyCSharpWSA;
 #endif
     public class Placeholder : MonoBehaviour
     {
