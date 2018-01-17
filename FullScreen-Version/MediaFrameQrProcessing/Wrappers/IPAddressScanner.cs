@@ -4,11 +4,12 @@
     using MediaFrameQrProcessing.VideoDeviceFinders;
     using System;
     using System.Net;
+    using System.Threading.Tasks;
     using Windows.Media.MediaProperties;
 
     public static class IPAddressScanner
     {
-        public static async void ScanFirstCameraForIPAddress(
+        public static async Task ScanFirstCameraForIPAddress(
           Action<IPAddress> resultCallback,
           TimeSpan timeout)
         {

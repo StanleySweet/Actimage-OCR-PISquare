@@ -20,7 +20,7 @@
         /// <param name="resultCallback"></param>
         /// <param name="timeout"></param>
         /// <param name="requestWord"></param>
-        public static async void ScanFirstCameraForWords(Action<List<ActiDetectedWord>> resultCallback, TimeSpan timeout, string requestWord)
+        public static async Task ScanFirstCameraForWords(Action<List<ActiDetectedWord>> resultCallback, TimeSpan timeout, string requestWord)
         {
 
             List<ActiDetectedWord> result = null;
@@ -30,7 +30,8 @@
             // around I ended up with a crash in Windows.Media.dll related
             // to disposing of the MediaCapture.
             // So...this isn't what I wanted but it seems to work better :-(
-            if (m_FrameProcessor == null)
+            // We still need to update it case the word has changed, else it w
+            if (m_FrameProcessor == null || !requestWord.Equals(m_FrameProcessor.RequestWord))
             {
                 var mediaFrameSourceFinder = new MediaFrameSourceFinder();
 

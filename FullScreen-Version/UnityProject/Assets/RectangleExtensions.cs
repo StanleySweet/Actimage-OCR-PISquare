@@ -1,37 +1,65 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-namespace Assets
+﻿namespace Assets
 {
-    static class RectangleExtensions
-    {        /// <summary>
-             /// Return a list of rectangles to make the outline.
-             /// </summary>
-             /// <param name="rectangle"></param>
-             /// <param name="borderWidth"></param>
-             /// <returns></returns>
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.UI;
 
-        public static List<Rect> GetRectOutlines(this Rect rectangle, int borderWidth, Transform mesh)
+    static class RectangleExtensions
+    {       
+        public static GameObject CreateRectangleMeshObject(this Rect rectangle, Transform parent, Color32 color)
+        {
+            using (var vh = new VertexHelper())
+            {
+                GameObject selectionBox = new GameObject(Constants.RESULT_BOX_NAME_PREFIX);
+                selectionBox.AddComponent<MeshFilter>();
+                selectionBox.transform.SetParent(parent, false);
+                selectionBox.transform.SetParent(parent.Find(Constants.CANVAS_MESH_NAME));
+                selectionBox.transform.localScale = new Vector3(1, 1, 1);
+                selectionBox.transform.localPosition = new Vector3(-398, 399, 0);
+                selectionBox.transform.localRotation = new Quaternion(1, 0, 0, 0);
+                MeshRenderer rend = selectionBox.AddComponent<MeshRenderer>();
+                rend.materials[0] = Resources.Load(Constants.LAMBERT_MATERIAL_LOCATION, typeof(Material)) as Material;
+                rend.materials[0].color = color;
+                rend.materials[0].shader = Shader.Find(Constants.RESULT_BOX_SHADER_NAME);
+                Mesh myMesh = selectionBox.GetComponent<MeshFilter>().mesh;
+                rectangle.DrawRectangle(vh, color, myMesh);
+                return selectionBox;
+            }
+        }
+
+        public static void DrawRectangle(this Rect rectangle, VertexHelper vh, Color32 color, Mesh mesh)
+        {
+            vh.AddVert(new Vector3(rectangle.x, rectangle.y), color, new Vector2(0f, 0f));
+            vh.AddVert(new Vector3(rectangle.x, rectangle.y + rectangle.height), color, new Vector2(0f, 1f));
+            vh.AddVert(new Vector3(rectangle.x + rectangle.width, rectangle.y + rectangle.height), color, new Vector2(1f, 1f));
+            vh.AddVert(new Vector3(rectangle.x + rectangle.width, rectangle.y), color, new Vector2(1f, 0f));
+
+            vh.AddTriangle(0, 1, 2);
+            vh.AddTriangle(2, 3, 0);
+            vh.FillMesh(mesh);
+        }
+        /// <summary>
+        /// Return a list of rectangles to make the outline.
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <param name="borderWidth"></param>
+        /// <returns></returns>
+        public static List<Rect> GetRectOutlines(this Rect rectangle, int borderWidth, bool scaling = false, Transform mesh = null)
         {
             List<Rect> rectangles = null;
-            float fixedPlaneWidth = 0.04700003F;
-            float fixedPlaneHeight = 0.03750001F;
-            int webcamHeight = DisplayWebcam.tex.height;
-            int webcamWidth = DisplayWebcam.tex.width;
+            int webcamHeight = DisplayWebcam.WebcamHeightResolution;
+            int webcamWidth = DisplayWebcam.WebcamWidthResolution;
             int screenWidth = Screen.width;
             int screenHeight = Screen.height;
+            float fixedPlaneWidth = Constants.DEBUG_PLANE_WIDTH * screenHeight;
+            float fixedPlaneHeight = Constants.DEBUG_PLANE_HEIGHT * screenWidth;
+            float horizontalRatio = 0.0F;
+            float verticalRatio = 0.0F;
 
-            fixedPlaneWidth = 0.04700003F * screenHeight;
-            fixedPlaneHeight = 0.03750001F * screenWidth;
-            var position = new Vector3(mesh.position.x, mesh.position.y, mesh.localPosition.z);
-
-            double horizontalRatio = 0.0;
-            double verticalRatio = 0.0;
-
-            if (Constants.DEBUG)
+            if (!Constants.DEBUG)
             {
-                horizontalRatio = screenWidth / webcamWidth;
-                verticalRatio = screenHeight / webcamHeight;
+                horizontalRatio = screenWidth / (float) webcamWidth;
+                verticalRatio = screenHeight / (float) webcamHeight;
             }
             else
             {
@@ -39,13 +67,15 @@ namespace Assets
                 verticalRatio = fixedPlaneHeight / webcamHeight;
             }
 
+            if (!scaling)
+                horizontalRatio = verticalRatio = 1;
 
-            float rectangleX = (float)(rectangle.x * horizontalRatio);
-            float rectangleY = (float)(rectangle.y * verticalRatio);
-            float rectangleWidth = (float)(rectangle.width * horizontalRatio);
-            float rectangleHeight = (float)(rectangle.height * verticalRatio);
-            float borderWidthHeight = (float)(borderWidth * verticalRatio);
-            float borderWidthWidth = (float)(borderWidth * horizontalRatio);
+            float rectangleX = rectangle.x * horizontalRatio;
+            float rectangleY = rectangle.y * verticalRatio;
+            float rectangleWidth = rectangle.width * horizontalRatio;
+            float rectangleHeight = rectangle.height * verticalRatio;
+            float borderWidthHeight = borderWidth * verticalRatio;
+            float borderWidthWidth = borderWidth * horizontalRatio;
 
             if (!Constants.DEBUG)
                 rectangles = new List<Rect>()
@@ -62,11 +92,6 @@ namespace Assets
             else
                 rectangles = new List<Rect>()
                 {
-                    //new Rect(rectangle.x, rectangle.y, rectangle.width, borderWidth),
-                    //new Rect(rectangle.x, rectangle.y + rectangle.height - borderWidth, rectangle.width, borderWidth),
-                    //new Rect(rectangle.x + rectangle.width - borderWidth, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2)),
-                    //new Rect(rectangle.x, rectangle.y + borderWidth,borderWidth, rectangle.height - (borderWidth * 2))
-
                     // Top Rectangle
                     new Rect(rectangleX, rectangleY, rectangleWidth, borderWidthHeight),
                     // Bottom Rectangle

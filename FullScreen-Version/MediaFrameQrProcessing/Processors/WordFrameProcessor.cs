@@ -16,13 +16,13 @@
     public class WordFrameProcessor : MediaCaptureFrameProcessor
     {
         public List<ActiDetectedWord> Result { get; private set; }
-        private string m_RequestWord;
+        public readonly string RequestWord;
         private OcrEngine m_OcrEngine;
 
         public WordFrameProcessor(string requestWord, MediaFrameSourceFinder mediaFrameSourceFinder, DeviceInformation videoDeviceInformation, string mediaEncodingSubtype, MediaCaptureMemoryPreference memoryPreference = MediaCaptureMemoryPreference.Cpu) : base(mediaFrameSourceFinder, videoDeviceInformation, mediaEncodingSubtype, memoryPreference)
         {
             Result = new List<ActiDetectedWord>();
-            this.m_RequestWord = requestWord;
+            this.RequestWord = requestWord;
         }
 
         protected override async Task<bool> ProcessFrameAsync(MediaFrameReference frameReference)
@@ -44,19 +44,21 @@
                         OcrResult ocrResult = await this.m_OcrEngine.RecognizeAsync(bitmap);
 
                         if (ocrResult == null)
-                            throw new Exception("Ocr Result is null");
+                            throw new NullReferenceException("Ocr Result is null");
 
-                        foreach (OcrWord word in ocrResult.Lines.SelectMany(l => l.Words).ToList())
+                        foreach (OcrWord word in ocrResult.Lines.SelectMany(l => l.Words))
                         {
-                            if ("quarante deux".Equals(m_RequestWord.ToLower()))
+                            if ("quarante deux".Equals(RequestWord.ToLower()))
                                 Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
-                            else if (word.Text.ToLower().Contains(m_RequestWord))
+                            else if (word.Text.ToLower().Equals(RequestWord.ToLower()))
                                 Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                            else if (LevenshteinDistance.Compute(m_RequestWord.ToLower(), word.Text.ToLower()) <= 2)
+                            else if (word.Text.ToLower().Contains(RequestWord.ToLower()))
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
+                            else if (RequestWord.ToLower().Contains(word.Text.ToLower()))
+                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
+                            else if (LevenshteinDistance.Compute(RequestWord.ToLower(), word.Text.ToLower()) <= 2)
                                 Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
-
                         }
-
 
                         success = Result.Count > 0;
                     }

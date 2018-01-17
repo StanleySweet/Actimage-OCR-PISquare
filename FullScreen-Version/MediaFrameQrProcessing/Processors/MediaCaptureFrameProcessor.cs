@@ -10,7 +10,7 @@
 
     public abstract class MediaCaptureFrameProcessor : IDisposable
     {
-        public MediaCaptureFrameProcessor(
+        protected MediaCaptureFrameProcessor(
           MediaFrameSourceFinder mediaFrameSourceFinder,
           DeviceInformation videoDeviceInformation,
           string mediaEncodingSubtype,
@@ -86,16 +86,22 @@
                 MemoryPreference = this.memoryPreference
             };
 
-            var mediaCapture = new MediaCapture();
+            var tempMediaCapture = new MediaCapture();
 
-            await mediaCapture.InitializeAsync(settings);
+            await tempMediaCapture.InitializeAsync(settings);
 
-            this.videoDeviceControllerInitialiser?.Invoke(mediaCapture.VideoDeviceController);
+            this.videoDeviceControllerInitialiser?.Invoke(tempMediaCapture.VideoDeviceController);
 
-            return (mediaCapture);
+            return (tempMediaCapture);
         }
 
         public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
             if (this.mediaCapture != null)
             {
@@ -105,10 +111,10 @@
         }
 
         Action<VideoDeviceController> videoDeviceControllerInitialiser;
-        string mediaEncodingSubtype;
-        MediaFrameSourceFinder mediaFrameSourceFinder;
-        DeviceInformation videoDeviceInformation;
-        MediaCaptureMemoryPreference memoryPreference;
+        readonly string mediaEncodingSubtype;
+        readonly MediaFrameSourceFinder mediaFrameSourceFinder;
+        readonly DeviceInformation videoDeviceInformation;
+        readonly MediaCaptureMemoryPreference memoryPreference;
         MediaCapture mediaCapture;
     }
 }
