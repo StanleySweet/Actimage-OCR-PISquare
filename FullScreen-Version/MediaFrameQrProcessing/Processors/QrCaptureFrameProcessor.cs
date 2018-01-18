@@ -31,6 +31,7 @@
                 {
                     try
                     {
+                        this.Result = null;
                         Result zxingResult = ZXingQRCodeDecoder.DecodeBufferToQRCode(bitmap);
 
                         if (zxingResult != null)

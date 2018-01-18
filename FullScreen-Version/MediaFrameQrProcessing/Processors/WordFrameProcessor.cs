@@ -15,21 +15,20 @@
 
     public class WordFrameProcessor : MediaCaptureFrameProcessor
     {
-        public List<ActiDetectedWord> Result { get; private set; }
-        public readonly string RequestWord;
-        private OcrEngine m_OcrEngine;
+        public HashSet<ActiDetectedWord> Result { get; private set; }
+        public string RequestWord { get; }
+        private static OcrEngine m_OcrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
 
         public WordFrameProcessor(string requestWord, MediaFrameSourceFinder mediaFrameSourceFinder, DeviceInformation videoDeviceInformation, string mediaEncodingSubtype, MediaCaptureMemoryPreference memoryPreference = MediaCaptureMemoryPreference.Cpu) : base(mediaFrameSourceFinder, videoDeviceInformation, mediaEncodingSubtype, memoryPreference)
         {
-            Result = new List<ActiDetectedWord>();
+            Result = new HashSet<ActiDetectedWord>();
             this.RequestWord = requestWord;
         }
 
         protected override async Task<bool> ProcessFrameAsync(MediaFrameReference frameReference)
         {
-            bool success = false;
-            Result?.Clear();
-
+            Boolean success = false;
+            // Takes at worst 60ms
             await Task.Run(async () =>
             {
                 // doc here https://msdn.microsoft.com/en-us/library/windows/apps/xaml/windows.media.capture.frames.videomediaframe.aspx
@@ -38,28 +37,29 @@
                 {
                     try
                     {
-                        if (this.m_OcrEngine == null)
-                            this.m_OcrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
-
-                        OcrResult ocrResult = await this.m_OcrEngine.RecognizeAsync(bitmap);
+                        
+                        OcrResult ocrResult = await m_OcrEngine.RecognizeAsync(bitmap);
+                        Result?.Clear();
 
                         if (ocrResult == null)
-                            throw new NullReferenceException("Ocr Result is null");
+                            return;
 
-                        foreach (OcrWord word in ocrResult.Lines.SelectMany(l => l.Words))
+                        foreach (OcrLine line in ocrResult.Lines)
                         {
-                            if ("quarante deux".Equals(RequestWord.ToLower()))
-                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
-                            else if (word.Text.ToLower().Equals(RequestWord.ToLower()))
-                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                            else if (word.Text.ToLower().Contains(RequestWord.ToLower()))
-                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                            else if (RequestWord.ToLower().Contains(word.Text.ToLower()))
-                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, true));
-                            else if (LevenshteinDistance.Compute(RequestWord.ToLower(), word.Text.ToLower()) <= 2)
-                                Result.Add(new ActiDetectedWord(word.Text, word.BoundingRect.X, word.BoundingRect.Y, word.BoundingRect.Width, word.BoundingRect.Height, false));
+                            foreach (OcrWord word in line.Words)
+                            {
+                                if ("quarante deux".Equals(RequestWord.ToLower()))
+                                    Result.Add(new ActiDetectedWord(word, false));
+                                else if (word.Text.ToLower().Equals(RequestWord.ToLower()))
+                                    Result.Add(new ActiDetectedWord(word, true));
+                                else if (word.Text.ToLower().Contains(RequestWord.ToLower()))
+                                    Result.Add(new ActiDetectedWord(word, true));
+                                else if (RequestWord.ToLower().Contains(word.Text.ToLower()))
+                                    Result.Add(new ActiDetectedWord(word, true));
+                                else if (LevenshteinDistance.Compute(RequestWord.ToLower(), word.Text.ToLower()) <= 2)
+                                    Result.Add(new ActiDetectedWord(word, false));
+                            }
                         }
-
                         success = Result.Count > 0;
                     }
                     catch (Exception ex)

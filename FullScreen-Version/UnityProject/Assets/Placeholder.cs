@@ -18,16 +18,13 @@
     {
         #region Attributes
         private TextMesh m_TextMesh;
-        private Transform m_PlaneMesh;
         private DictationRecognizer m_DictationRecognizer;
         private Boolean m_Searching;
-        private Boolean m_Validated;
         private Boolean m_Decrypting;
+        private Boolean doOnce = true;
         private Boolean m_StartedRecognition;
         private String m_WordToSearch;
         private String m_WordSearchedFor;
-        private List<Rect> m_Rectangles;
-        private List<Color32> m_Colors;
         private HashSet<GameObject> m_ResultBoxes;
         #endregion
 
@@ -47,12 +44,9 @@
         {
             this.m_TextMesh = GetComponentInChildren<TextMesh>();
             this.m_Searching = false;
-            this.m_Validated = false;
             this.m_Decrypting = false;
             this.m_WordToSearch = string.Empty;
             this.m_StartedRecognition = false;
-            this.m_Rectangles = new List<Rect>();
-            this.m_Colors = new List<Color32>();
             this.m_DictationRecognizer = null;
             this.m_ResultBoxes = new HashSet<GameObject>();
         }
@@ -78,35 +72,24 @@
         /// </summary>
         public void Start()
         {
-            if (Constants.DEBUG)
-            {
-                // VR Causes issues on local windows.
-                this.DisableVirtualReality();
-                this.m_PlaneMesh = GetDebugPlane();
-            }
+            // Dictation Manager requires permanent
+            // internet connection.
             if (HasInternet())
-            {
-                this.Reset();
-                this.InitDictationRecognizer();
-            }
-            else
-            {
-                this.m_TextMesh.text = Constants.ERROR_NO_INTERNET;
-            }
 #if UNITY_EDITOR
-            m_Rectangles.Add(new Rect(75, 50, 200, 50));
-            m_Rectangles.Add(new Rect(200, 500, 200, 50));
-            m_Colors.Add(Constants.PERFECT_MATCH_COLOR);
-            m_Colors.Add(Constants.APPROXIMATE_MATCH_COLOR);
+            { }
 #endif
+#if !UNITY_EDITOR
+                this.Reset();
+#endif
+            else
+                this.m_TextMesh.text = Constants.ERROR_NO_INTERNET;
         }
 
         public static bool HasInternet()
         {
 #if !UNITY_EDITOR
             ConnectionProfile connections = NetworkInformation.GetInternetConnectionProfile();
-            bool internet = connections != null && connections.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.InternetAccess;
-            return internet;
+            return connections != null && connections.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.InternetAccess;
 #endif
 #if UNITY_EDITOR
             return true;
@@ -116,13 +99,46 @@
 
         public void Update()
         {
+
+
+            if (doOnce && Constants.DEBUG)
+            {
+                doOnce = false;
+                var tempWidth = DisplayWebcam.WebcamWidthResolution;
+                var tempHeight = DisplayWebcam.WebcamHeightResolution;
+#if UNITY_EDITOR
+                var rectangles = new List<Rect>()
+                {
+                    new Rect(-663.75F, -540.00F, 180.00F, 2.00F),
+                    new Rect(-663.75F, -362.00F, 180.00F, 2.00F),
+                    new Rect(-485.75F, -538.00F, 2.00F, 176.00F),
+                    new Rect(-663.75F, -538.00F, 2.00F, 176.00F)
+                };
+
+                m_ResultBoxes.Add(rectangles.CreateRectangleMeshObject(FindObjectOfType<Canvas>().transform.parent, Color.white, "AA"));
+
+#endif
+#if !UNITY_EDITOR
+                if (Constants.DEBUG)
+                {
+                    var temp = new HashSet<ActiDetectedWord>() {
+                    new ActiDetectedWord("AA", 25, 0, 80, 80, false),
+                    new ActiDetectedWord("BB", 25, tempHeight -50, 50, 50, true),
+                    new ActiDetectedWord("CC", tempWidth -50 , 0, 50, 50, true),
+                    new ActiDetectedWord("DD", tempWidth -50 , tempHeight -50, 50, 50, true),
+                    new ActiDetectedWord("EE", (tempWidth / 2) -25 , (tempHeight / 2) -25,50, 50, true),
+                    new ActiDetectedWord("FF", 25, (tempHeight / 2) -25,50, 50, true),
+                    new ActiDetectedWord("GG", (tempWidth / 2) -25 , 0,50, 50, true)
+                };
+                    GetWordsBoundingBoxes(temp);
+                }
+#endif
+            }
             Screen.fullScreen = true;
         }
 
         private void ClearLists()
         {
-            this.m_Rectangles.Clear();
-            this.m_Colors.Clear();
             foreach (var box in m_ResultBoxes)
                 Destroy(box);
             this.m_ResultBoxes.Clear();
@@ -133,8 +149,6 @@
             if (Constants.STOP_KEYWORD.Equals(text))
             {
                 FunctionProxyOnMainThread(Reset);
-                if (Constants.DEBUG)
-                    FunctionProxyOnMainThread(DisplayWebcamPreview);
                 return;
             }
 
@@ -149,14 +163,9 @@
                 this.m_TextMesh.text = Constants.SEARCHING_FOR_QR_CODES;
                 this.m_Decrypting = true;
 #if !UNITY_EDITOR
-                try
-                {
-                    ZXingQrCodeScanner.ScanFirstCameraForQrCode(GetQRCode, TimeSpan.FromSeconds(Constants.TIMEOUT));
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log(ex.Message);
-                }
+                if (Constants.DEBUG)
+                    FunctionProxyOnMainThread(DisplayWebcam.StopWebcamPlayback);
+                ZXingQrCodeScanner.ScanFirstCameraForQrCode(GetQRCode, TimeSpan.FromSeconds(Constants.TIMEOUT));
 #endif
             }
             else if (this.m_Searching)
@@ -169,20 +178,21 @@
                         this.m_TextMesh.text = String.Format(Constants.LOOKING_FOR_WORD, this.m_WordToSearch);
 
                         this.m_StartedRecognition = true;
+                        this.m_WordSearchedFor = this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch;
+#if !UNITY_EDITOR
+                        if (Constants.DEBUG)
+                            FunctionProxyOnMainThread(DisplayWebcam.StopWebcamPlayback);
+
                         ThreadSafeDelaySecondsCoroutine(() =>
                         {
-                            this.m_WordSearchedFor = this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch;
-                            Debug.Log(this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch);
-#if !UNITY_EDITOR
-                                WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch);
-#endif
-                        }, () =>
-                            {
-                        Scan(Constants.STOP_KEYWORD);
-                        if (Constants.DEBUG)
-                            FunctionProxyOnMainThread(DisplayWebcamPreview);
-                    }, 2);
+                            WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch);
 
+                        }, () =>
+                        {
+                            this.m_TextMesh.text += '\n' + Constants.STOP_PROMPT;
+                        }, (float)Constants.TIMEOUT);
+#endif
+                     
 
                     }
                 }
@@ -194,10 +204,12 @@
                         this.m_TextMesh.text = string.Format(Constants.THE_WORD_YOU_ARE_LOOKING_FOR_IS, this.m_WordToSearch, Constants.FINAL_WORD_SEARCH_PROMPT);
                     }, () =>
                     {
-                    }, 1);
+                    }, 0.1F);
                 }
             }
         }
+
+
 
         /// <summary>
         /// This function is called on start and each time the users stop the application
@@ -211,7 +223,6 @@
             }, () =>
             {
                 this.m_Decrypting = false;
-                this.m_Validated = false;
                 this.m_Searching = false;
                 this.m_StartedRecognition = false;
                 this.m_WordToSearch = string.Empty;
@@ -219,36 +230,11 @@
                 this.m_TextMesh.text = Constants.HOME_PROMPT;
                 ClearLists();
                 this.InitDictationRecognizer();
+                if (Constants.DEBUG)
+                    FunctionProxyOnMainThread(DisplayWebcam.StartWebcamPlayback);
             }, 0.1f);
         }
 
-#if UNITY_EDITOR
-        public void OnGUI()
-        {
-            m_Rectangles.Add(new Rect(75, 50, 200, 50));
-            m_Rectangles.Add(new Rect(200, 500, 200, 50));
-            m_Colors.Add(Constants.PERFECT_MATCH_COLOR);
-            m_Colors.Add(Constants.APPROXIMATE_MATCH_COLOR);
-            try
-            {
-                for (Int16 j = 0; j < m_Rectangles.Count; ++j)
-                {
-                    var borderRectangles = m_Rectangles[j].GetRectOutlines(2);
-                    if (Constants.DEBUG)
-                        borderRectangles = m_Rectangles[j].GetRectOutlines(2, m_PlaneMesh);
-
-                    foreach (var borderRectangle in borderRectangles)
-                    {
-                        GUI.DrawTexture(borderRectangle, Texture2D.whiteTexture, ScaleMode.ScaleAndCrop, false, 1, Color.red, 2, 0);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Log(Constants.ERROR_DISPLAYING_RECTANGLES + ex.Message);
-            }
-        }
-#endif
 #if !UNITY_EDITOR
         public void GetQRCode(string result)
         {
@@ -265,52 +251,43 @@
                 }
             }, () =>
             {
-                if (Constants.DEBUG)
-                    FunctionProxyOnMainThread(DisplayWebcamPreview);
-                Scan(Constants.STOP_KEYWORD);
             }, (float)Constants.TIMEOUT);
         }
 
-        private void GetWordsBoundingBoxes(List<ActiDetectedWord> result)
+        private void GetWordsBoundingBoxes(HashSet<ActiDetectedWord> result)
         {
-            String resultStatistics = String.Empty;
-            try
+
+
+            FunctionProxyOnMainThread(() =>
             {
-                FunctionProxyOnMainThread(ClearLists);
-                foreach (ActiDetectedWord resultat in result)
+                String resultStatistics = String.Empty;
+                try
                 {
-                    m_Rectangles.Add(new Rect(resultat.PosX, resultat.PosY, resultat.Width, resultat.Height));
-                    m_Colors.Add(resultat.IsExactMatch() ? Constants.PERFECT_MATCH_COLOR : Constants.APPROXIMATE_MATCH_COLOR);
-                }
-                for (Int16 j = 0; j < m_Rectangles.Count; ++j)
-                {
-                    var borderRectangles = m_Rectangles[j].GetRectOutlines(2);
-                    foreach (var borderRectangle in borderRectangles)
+                    FunctionProxyOnMainThread(ClearLists);
+
+                    int numberOfExactMatches = 0;
+                    foreach (ActiDetectedWord resultat in result)
                     {
-                        m_ResultBoxes.Add(borderRectangle.CreateRectangleMeshObject(FindObjectOfType<Canvas>().transform.parent, m_Colors[j]));
+                        var rect = new Rect(resultat.PosX, resultat.PosY, resultat.Width, resultat.Height);
+                        var borderRectangles = rect.GetRectOutlines(2, FindObjectOfType<Canvas>().transform.GetComponent<RectTransform>().rect);
+                        m_ResultBoxes.Add(borderRectangles.CreateRectangleMeshObject(FindObjectOfType<Canvas>().transform.parent, resultat.IsExactMatch() ? Constants.PERFECT_MATCH_COLOR : Constants.APPROXIMATE_MATCH_COLOR, resultat.DetectedWord));
+                        if (resultat.IsExactMatch())
+                            ++numberOfExactMatches;
                     }
+
+                    resultStatistics = string.Format(Constants.RESULT_TEXT_RECOGNITION_SENTENCE, numberOfExactMatches, (result.Count - numberOfExactMatches), this.m_WordSearchedFor);
+
                 }
-
-                int numberOfExactMatches = result.Count(r => r.IsExactMatch());
-                resultStatistics = string.Format(Constants.RESULT_TEXT_RECOGNITION_SENTENCE, numberOfExactMatches, (result.Count - numberOfExactMatches), this.m_WordSearchedFor);
-
-            }
-            catch (Exception ex)
-            {
-                print(Constants.ERROR_LOOKING_FOR_WORDS + ex.Message);
-                resultStatistics = Constants.ERROR_NO_RESULT_FOUND;
-            }
-
-            FunctionProxyOnMainThread(() => { this.m_TextMesh.text = resultStatistics; });
+                catch (Exception ex)
+                {
+                    print(Constants.ERROR_LOOKING_FOR_WORDS + ex.Message);
+                    resultStatistics = Constants.ERROR_NO_RESULT_FOUND;
+                }
+                this.m_TextMesh.text = resultStatistics;
+            });
         }
 
 #endif
-
-        private void DisplayWebcamPreview()
-        {
-            DisplayWebcam.tex.Play();
-        }
-
         public void FunctionProxyOnMainThread(Action callback)
         {
             if (UnityEngine.WSA.Application.RunningOnAppThread())
@@ -349,34 +326,6 @@
             callback2();
             yield break;
         }
-
-        #region Debug
-
-        public Transform GetDebugPlane()
-        {
-            var transforms = GetComponentsInChildren<Transform>();
-            Transform transform = null;
-            foreach (var transformPivots in transforms)
-            {
-                if (transformPivots.name.Equals(Constants.PLANE_MESH_NAME))
-                    transform = transformPivots;
-            }
-            return transform;
-        }
-
-        private void DisableVirtualReality()
-        {
-            StartCoroutine(LoadDevice(Constants.DEFAULT_VR_DEVICE_NAME, false));
-        }
-
-        IEnumerator LoadDevice(string newDevice, bool enable)
-        {
-            XRSettings.LoadDeviceByName(newDevice);
-            yield return null;
-            XRSettings.enabled = enable;
-        }
-        #endregion
-
 
         #region Utils
         private void DisablePhraseRecognitionSystem()
@@ -422,8 +371,6 @@
 
             if (SpeechSystemStatus.Stopped == this.m_DictationRecognizer.Status)
                 this.m_DictationRecognizer.Start();
-
-            Debug.Log(Constants.IS_MICROPHONE_RECORDING);
         }
         #endregion
     }

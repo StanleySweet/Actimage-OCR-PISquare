@@ -20,8 +20,7 @@ namespace Assets
             // If not in debug mode do not display the webcam.
             if (!Constants.DEBUG)
             {
-                rend.enabled = false;
-                tex.Stop();
+                StopWebcamPlayback();
             }
             Debug.Log(Constants.WEBCAM_HAS_INITIALIZED_SUCESSFULLY);
         }
@@ -32,9 +31,20 @@ namespace Assets
             rend = this.GetComponentInChildren<Renderer>();
             tex = new WebCamTexture(devices[0].name);
             rend.material.mainTexture = tex;
-            tex.Play();
+            StartWebcamPlayback();
             WebcamHeightResolution = tex.height;
             WebcamWidthResolution = tex.width;
+        }
+
+        public static void StartWebcamPlayback()
+        {
+            tex.Play();
+            rend.enabled = true;
+        }
+        public static void StopWebcamPlayback()
+        {
+            tex.Stop();
+            rend.enabled = false;
         }
     }
 }

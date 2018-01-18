@@ -7,7 +7,6 @@
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading.Tasks;
-    using Windows.Devices.Enumeration;
     using Windows.Media.MediaProperties;
 
     public static class WordScanner
@@ -15,22 +14,19 @@
         private static WordFrameProcessor m_FrameProcessor;
 
         /// <summary>
-        /// 
+        /// Note - I keep this frame processor around which means keeping the
+        /// underlying MediaCapture around because when I didn't keep it
+        /// around I ended up with a crash in Windows.Media.dll related
+        /// to disposing of the MediaCapture.
+        /// So...this isn't what I wanted but it seems to work better :-(
         /// </summary>
         /// <param name="resultCallback"></param>
         /// <param name="timeout"></param>
         /// <param name="requestWord"></param>
-        public static async Task ScanFirstCameraForWords(Action<List<ActiDetectedWord>> resultCallback, TimeSpan timeout, string requestWord)
+        public static async Task ScanFirstCameraForWords(Action<HashSet<ActiDetectedWord>> resultCallback, TimeSpan timeout, string requestWord)
         {
 
-            List<ActiDetectedWord> result = null;
-
-            // Note - I keep this frame processor around which means keeping the
-            // underlying MediaCapture around because when I didn't keep it
-            // around I ended up with a crash in Windows.Media.dll related
-            // to disposing of the MediaCapture.
-            // So...this isn't what I wanted but it seems to work better :-(
-            // We still need to update it case the word has changed, else it w
+            // We still need to update it case the word has changed, else it will keep the same word at each call
             if (m_FrameProcessor == null || !requestWord.Equals(m_FrameProcessor.RequestWord))
             {
                 var mediaFrameSourceFinder = new MediaFrameSourceFinder();
@@ -72,19 +68,24 @@
                 // every frame that return something will bring us
                 // back in this loop. so we call the call back to display what we found.
                 // and we continue iterating until all time has run out.
+                await m_FrameProcessor.CreateMediaFastFrameReader();
                 while (!done)
                 {
-                    // Get data from the frames 
-                    await m_FrameProcessor.ProcessFramesAsync(currentTimeout);
-                    // See what result we got.
-                    result = m_FrameProcessor.Result;
-                    // Call back with whatever result we got.
-                    resultCallback(result);
-                    // If we timed out just leave.
-                    done = (DateTime.Now - startTime) > timeout;
-                    // Continue scanning with the time we have left
-                    currentTimeout = (DateTime.Now - startTime);
+                    await Task.Run(async () =>
+                    {
+                        // Get data from the frames 
+                        await m_FrameProcessor.ProcessFramesAsyncLoop(m_FrameProcessor.mediaFastFrameReader, currentTimeout, DateTime.Now);
+                        // See what result we got.
+                        // Call back with whatever result we got.
+                        resultCallback(m_FrameProcessor.Result);
+                        // If we timed out just leave.
+                        done = (DateTime.Now - startTime) > timeout;
+                        // Continue scanning with the time we have left
+                        currentTimeout = (DateTime.Now - startTime);
+                    });
                 }
+                // Dispose the frame reader
+                await m_FrameProcessor.DisposeMediaFastFrameReader();
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace MediaFrameQrProcessing.Entities
+﻿using Windows.Media.Ocr;
+
+namespace MediaFrameQrProcessing.Entities
 {
     public class ActiDetectedWord
     {
@@ -16,6 +18,16 @@
             _posY = posY;
             _height = height;
             _width = width;
+            _exactMatch = exactMatch;
+        }
+
+        public ActiDetectedWord(OcrWord word, bool exactMatch = false)
+        {
+            _originalText = word.Text;
+            _posX = word.BoundingRect.X;
+            _posY = word.BoundingRect.Y;
+            _height = word.BoundingRect.Height;
+            _width = word.BoundingRect.Width;
             _exactMatch = exactMatch;
         }
         public string DetectedWord => _originalText;
