@@ -27,7 +27,7 @@
         public static readonly String IS_MICROPHONE_RECORDING = "Le Microphone " + (Microphone.IsRecording(DEFAULT_MICROPHONE_DEVICE_NAME) ? "est" : "n'est pas ") + " en train d'enregistrer.";
         public static readonly String EXACT_MATCHES_WERE_FOUND = " occurence(s) exacte(s) ont été trouvée(s). \n ";
         public static readonly String APPROXIMATE_MATCHES_WERE_FOUND = " occurence(s) proche(s) ont été trouvée(s). \n pour le mot : ";
-        public static readonly String RESULT_TEXT_RECOGNITION_SENTENCE = "{0}" + EXACT_MATCHES_WERE_FOUND + "{1}" + APPROXIMATE_MATCHES_WERE_FOUND + "' {2} '.";
+        public static readonly String RESULT_TEXT_RECOGNITION_SENTENCE = "Recherche pendant " + TIMEOUT + " secondes . \n {0}" + EXACT_MATCHES_WERE_FOUND + "{1}" + APPROXIMATE_MATCHES_WERE_FOUND + "' {2} '.";
         public static readonly String THE_WORD_YOU_ARE_LOOKING_FOR_IS = "Le mot à rechercher est {0} \n {1}";
         public static readonly String PLANE_MESH_NAME = "Plane";
         public static readonly String CANVAS_MESH_NAME = "Canvas";
