@@ -7,13 +7,14 @@
         #region Critical Constants
         public static readonly String WILDCARD_HEARD_TEXT = "42";
         public static readonly String WILDCARD_TEXT = "quarante deux";
-        public static readonly String SEARCH_KEYWORD = "rechercher";
-        public static readonly String QRCODE_KEYWORD = "traduire";
-        public static readonly String VALIDATION_KEYWORD = "okay";
-        public static readonly String CORRECTION_KEYWORD = "changer";
         public static readonly String STOP_KEYWORD = "stop";
         public static readonly Double TIMEOUT = 10;
         public static readonly Boolean DEBUG = false;
+        public static Boolean english = true;
+        public static readonly String SEARCH_KEYWORD = english ? "search for" : "rechercher";
+        public static readonly String QRCODE_KEYWORD = english ? "translate" : "traduire";
+        public static readonly String VALIDATION_KEYWORD = english ? "OK" : "okay";
+        public static readonly String CORRECTION_KEYWORD = english ? "change" : "changer";
         #endregion
 
         #region 

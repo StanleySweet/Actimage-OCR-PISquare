@@ -709,8 +709,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e09147e2b1429c9428010f6aa89f91c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NearClipPlane_OpaqueDisplay: 0.1
-  CameraClearFlags_OpaqueDisplay: 1
+  NearClipPlane_OpaqueDisplay: 0.85
+  CameraClearFlags_OpaqueDisplay: 2
   BackgroundColor_OpaqueDisplay: {r: 0, g: 0, b: 0, a: 1}
   OpaqueQualityLevel: 5
   NearClipPlane_TransparentDisplay: 0.85
