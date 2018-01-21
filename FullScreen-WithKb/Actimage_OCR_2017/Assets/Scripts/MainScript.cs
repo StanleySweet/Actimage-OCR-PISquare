@@ -138,7 +138,6 @@ public class MainScript : MonoBehaviour
 
     private void Scan(string text)
     {
-        var lol = 0;
         if (Constants.STOP_KEYWORD.Equals(text))
         {
             FunctionProxyOnMainThread(Reset);
@@ -165,7 +164,12 @@ public class MainScript : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(m_WordToSearch))
             {
-                if (Constants.VALIDATION_KEYWORD.Equals(text) && !this.m_StartedRecognition)
+                if(Constants.CORRECTION_KEYWORD.Equals(text))
+                {
+                    this.m_WordToSearch = string.Empty;
+                    this.m_TextMesh.text = Constants.SEARCH_PROMPT;
+                }
+                else if (Constants.VALIDATION_KEYWORD.Equals(text) && !this.m_StartedRecognition)
                 {
 
                     this.m_TextMesh.text = String.Format(Constants.LOOKING_FOR_WORD, this.m_WordToSearch);
@@ -321,17 +325,8 @@ public class MainScript : MonoBehaviour
     }
 
     #region Utils
-    private void DisablePhraseRecognitionSystem()
-    {
-        if (SpeechSystemStatus.Running.Equals(PhraseRecognitionSystem.Status))
-            PhraseRecognitionSystem.Shutdown();
-    }
     private void InitDictationRecognizer()
     {
-        // Important : If this is not disabled dictation recognizer will 
-        // not start
-        this.DisablePhraseRecognitionSystem();
-
         m_DictationRecognizer?.Dispose();
         m_DictationRecognizer = new DictationRecognizer()
         {
@@ -362,8 +357,7 @@ public class MainScript : MonoBehaviour
             Debug.Log(string.Format(Constants.ERROR_IN_DICTATION, error, hresult));
         };
 
-        if (SpeechSystemStatus.Stopped == this.m_DictationRecognizer.Status)
-            this.m_DictationRecognizer.Start();
+        this.m_DictationRecognizer.Start();
     }
     #endregion
 }

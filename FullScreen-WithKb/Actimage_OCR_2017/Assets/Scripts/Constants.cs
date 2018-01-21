@@ -7,9 +7,10 @@
         #region Critical Constants
         public static readonly String WILDCARD_HEARD_TEXT = "42";
         public static readonly String WILDCARD_TEXT = "quarante deux";
-        public static readonly String SEARCH_KEYWORD = "search for";
-        public static readonly String QRCODE_KEYWORD = "translate";
-        public static readonly String VALIDATION_KEYWORD = "OK";
+        public static readonly String SEARCH_KEYWORD = "rechercher";
+        public static readonly String QRCODE_KEYWORD = "traduire";
+        public static readonly String VALIDATION_KEYWORD = "okay";
+        public static readonly String CORRECTION_KEYWORD = "changer";
         public static readonly String STOP_KEYWORD = "stop";
         public static readonly Double TIMEOUT = 10;
         public static readonly Boolean DEBUG = false;
@@ -34,7 +35,7 @@
         public static readonly String RESULT_BOX_NAME_PREFIX = "ResultBox";
         public static readonly String DEFAULT_MATERIAL_LOCATION = "Resources/unity_builtin_extra/Default-Material.mat";
         public static readonly String TEXT_QUITTING_APPLICATION = "Arrêt de l'application";
-        public static readonly String FINAL_WORD_SEARCH_PROMPT = String.Format("dites '{1}' pour continuer. \n Dites '{0}' pour annuler", STOP_KEYWORD, VALIDATION_KEYWORD);
+        public static readonly String FINAL_WORD_SEARCH_PROMPT = String.Format("dites '{1}' pour continuer. \n Dites '{0}' pour annuler.\n Dites '{2}' pour corriger", STOP_KEYWORD, VALIDATION_KEYWORD, CORRECTION_KEYWORD);
         public static readonly String SEARCHING_FOR_QR_CODES = "Recherche de QR codes en cours";
         public static readonly String STOP_PROMPT = string.Format("Dites '{0}' pour annuler.", STOP_KEYWORD);
         public static readonly String SEARCH_PROMPT = string.Format("Donnez le mot à rechercher. \n Dites '{0}' pour annuler.", STOP_KEYWORD);
