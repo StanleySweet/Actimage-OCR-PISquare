@@ -34,6 +34,7 @@
             MeshRenderer rend = selectionBox.AddComponent<MeshRenderer>();
             rend.materials[0] = Resources.Load(Constants.DEFAULT_MATERIAL_LOCATION, typeof(Material)) as Material;
             rend.materials[0].color = color;
+            rend.materials[0].shader = Resources.Load(Constants.TEXT_SHADER_LOCATION, typeof(Shader)) as Shader;
             Mesh myMesh = selectionBox.AddComponent<MeshFilter>().mesh;
             rectangles.DrawRectangleOutline(color, myMesh);
 

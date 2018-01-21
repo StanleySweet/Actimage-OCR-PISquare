@@ -10,15 +10,18 @@
         public static readonly String STOP_KEYWORD = "stop";
         public static readonly Double TIMEOUT = 10;
         public static readonly Boolean DEBUG = false;
-        public static Boolean english = true;
-        public static readonly String SEARCH_KEYWORD = english ? "search for" : "rechercher";
-        public static readonly String QRCODE_KEYWORD = english ? "translate" : "traduire";
-        public static readonly String VALIDATION_KEYWORD = english ? "OK" : "okay";
-        public static readonly String CORRECTION_KEYWORD = english ? "change" : "changer";
+        public static readonly Boolean ENGLISH_PROMPTS = true;
+        public static readonly String SEARCH_KEYWORD = ENGLISH_PROMPTS ? "search for" : "rechercher";
+        public static readonly String QRCODE_KEYWORD = ENGLISH_PROMPTS ? "translate" : "traduire";
+        public static readonly String VALIDATION_KEYWORD = ENGLISH_PROMPTS ? "OK" : "okay";
+        public static readonly String CORRECTION_KEYWORD = ENGLISH_PROMPTS ? "change" : "changer";
         #endregion
 
         #region 
-        public static readonly String WEBCAM_HAS_INITIALIZED_SUCESSFULLY = "La webcam a été initialisée correctement.";
+        public static readonly String TEXT_INPUT_MESH_LABEL = "EmailText";
+        public static readonly String TEXT_PROMPT_MESH_LABEL = "EmailTitle";
+        public static readonly String WEBCAM_HAS_BEEN_INITIALIZED_SUCESSFULLY = "La webcam a été initialisée correctement.";
+        public static readonly String WEBCAM_HAS_NOT_BEEN_INITIALIZED_SUCESSFULLY = "La webcam n'a pas été initialisée correctement.";
         public static readonly Color32 PERFECT_MATCH_COLOR = Color.green;
         public static readonly Color32 APPROXIMATE_MATCH_COLOR = Color.yellow;
         public static readonly float DEBUG_PLANE_WIDTH = 0.04700003F;
