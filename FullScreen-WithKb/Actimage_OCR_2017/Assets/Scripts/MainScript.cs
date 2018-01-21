@@ -182,8 +182,10 @@ public class MainScript : MonoBehaviour
 
                         ThreadSafeDelaySecondsCoroutine(() =>
                         {
-                            WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch);
-
+                            WordScanner.ScanFirstCameraForWords(GetWordsBoundingBoxes, TimeSpan.FromSeconds(Constants.TIMEOUT), this.m_WordToSearch.Equals(Constants.WILDCARD_HEARD_TEXT) ? Constants.WILDCARD_TEXT : this.m_WordToSearch).ContinueWith((task) => 
+                            {
+                                FunctionProxyOnMainThread(() => this.m_TextMesh.text += Constants.SEARCH_IS_OVER);
+                            });
                         }, () =>
                         {
                             this.m_TextMesh.text += '\n' + Constants.STOP_PROMPT;
