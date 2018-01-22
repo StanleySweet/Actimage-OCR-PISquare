@@ -10,7 +10,7 @@
         public static readonly String STOP_KEYWORD = "stop";
         public static readonly Double TIMEOUT = 10;
         public static readonly Boolean DEBUG = false;
-        public static readonly Boolean ENGLISH_PROMPTS = true;
+        public static readonly Boolean ENGLISH_PROMPTS = false;
         public static readonly String SEARCH_KEYWORD = ENGLISH_PROMPTS ? "search for" : "rechercher";
         public static readonly String QRCODE_KEYWORD = ENGLISH_PROMPTS ? "translate" : "traduire";
         public static readonly String VALIDATION_KEYWORD = ENGLISH_PROMPTS ? "OK" : "okay";
@@ -48,7 +48,7 @@
         public static readonly String LOOKING_FOR_WORD = "Recherche en cours pour le mot '{0}'.";
         public static readonly String RESET_IN_PROGRESS = "Réinitialisation en cours";
         public static readonly String NO_QR_CODE_FOUND = "Aucun QR code trouvé, \n Dites '" + STOP_KEYWORD + "' pour retourner au menu ";
-        public static readonly String HOME_PROMPT = string.Format("Dites '{0}' pour commencer \n ou '{1}' pour dechiffrer un QR code", SEARCH_KEYWORD, QRCODE_KEYWORD);
+        public static readonly String HOME_PROMPT = string.Format("Tapez dans la barre le mot à rechercher et cliquez sur le bouton scan, ou \n Dites '{0}' pour commencer \n ou '{1}' pour dechiffrer un QR code", SEARCH_KEYWORD, QRCODE_KEYWORD);
         public static readonly String ERROR_DISPLAYING_RECTANGLES = "ERREUR : Erreur lors de l'affichage du/des rectangle(s). ";
         public static readonly String ERROR_LOOKING_FOR_WORDS = "ERREUR : Erreur lors de la recherche de mots";
         public static readonly String ERROR_COMPLETING_DICTATION = "ERREUR : La dictée ne s'est pas terminée correctement: {0} .";
