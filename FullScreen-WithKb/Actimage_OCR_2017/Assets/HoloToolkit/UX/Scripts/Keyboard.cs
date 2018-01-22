@@ -464,15 +464,6 @@ namespace HoloToolkit.UI.Keyboard
         /// </summary>
         private void BeginDictation()
         {
-#if UNITY_WSA || UNITY_STANDALONE_WIN
-            if (m_Dictation == null)
-            {
-                m_Dictation = new DictationRecognizer();
-                m_Dictation.DictationResult += OnDictationResult;
-            }
-
-            m_Dictation.Start();
-#endif
         }
 
         /// <summary>
@@ -481,12 +472,6 @@ namespace HoloToolkit.UI.Keyboard
         /// TODO: Something needs to call this.
         public void EndDictation()
         {
-#if UNITY_WSA || UNITY_STANDALONE_WIN
-            if (m_Dictation.Status == SpeechSystemStatus.Running)
-            {
-                m_Dictation.Stop();
-            }
-#endif
         }
 
         #endregion Dictation

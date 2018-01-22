@@ -60,7 +60,6 @@
             var textMeshes = GetComponentsInChildren<Text>().ToList();
             this.m_TextPromptMesh = textMeshes.FirstOrDefault(a => a.name.Equals(Constants.TEXT_PROMPT_MESH_LABEL));
             this.m_TextInputMesh = textMeshes.FirstOrDefault(a => a.name.Equals(Constants.TEXT_INPUT_MESH_LABEL));
-            this.m_TextInputMesh.text = "42";
         }
 
         /// <summary>
@@ -175,7 +174,7 @@
             }
             else if (this.m_Searching)
             {
-                if (!string.IsNullOrEmpty(m_WordToSearch))
+                if (!string.IsNullOrEmpty(m_WordToSearch) || !string.IsNullOrEmpty(this.m_TextPromptMesh.text))
                 {
                     if (Constants.CORRECTION_KEYWORD.Equals(text))
                     {
@@ -228,7 +227,19 @@
 
         public void OnClickScan()
         {
-            Scan(Constants.SEARCH_KEYWORD);
+            ThreadSafeDelaySecondsCoroutine(() =>
+            {
+                Scan(Constants.SEARCH_KEYWORD);
+            }, () =>
+            {
+                ThreadSafeDelaySecondsCoroutine(() =>
+                {
+                    Scan(this.m_TextPromptMesh.text);
+                }, () =>
+                {
+                    Scan(Constants.VALIDATION_KEYWORD);
+                }, 0.1F);
+            }, 0.1F);
         }
 
         public void OnClickStop()
