@@ -145,6 +145,7 @@
         {
             foreach (var box in m_ResultBoxes)
                 Destroy(box);
+            this.m_TextInputMesh.text = "";
             this.m_ResultBoxes.Clear();
         }
 
@@ -174,7 +175,7 @@
             }
             else if (this.m_Searching)
             {
-                if (!string.IsNullOrEmpty(m_WordToSearch) || !string.IsNullOrEmpty(this.m_TextPromptMesh.text))
+                if (!string.IsNullOrEmpty(m_WordToSearch) || !string.IsNullOrEmpty(this.m_TextInputMesh.text))
                 {
                     if (Constants.CORRECTION_KEYWORD.Equals(text))
                     {
