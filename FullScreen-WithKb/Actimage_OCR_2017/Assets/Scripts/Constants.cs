@@ -38,8 +38,8 @@
         public static readonly String SEARCH_IS_OVER = "\n Fin de la recherche dites '" + STOP_KEYWORD + "' pour retourner au menu.";
         public static readonly String THE_QR_CODE_MEANS = "Le QR code représente : {0}\n Dites '" + STOP_KEYWORD + "' pour retourner au menu";
         public static readonly String RESULT_BOX_NAME_PREFIX = "ResultBox";
-        public static readonly String DEFAULT_MATERIAL_LOCATION = "Resources/unity_builtin_extra/Default-Material.mat";
-        public static readonly String TEXT_SHADER_LOCATION = "UI/Default/Default UI Material";
+        public static readonly String DEFAULT_MATERIAL_LOCATION = "/HoloToolkit/Input/Models/Cursor/Materials/lambert1.mat";
+        public static readonly String TEXT_SHADER_LOCATION = "UI/Default Font";
         public static readonly String TEXT_QUITTING_APPLICATION = "Arrêt de l'application";
         public static readonly String FINAL_WORD_SEARCH_PROMPT = String.Format("dites '{1}' pour continuer. \n Dites '{0}' pour annuler.\n Dites '{2}' pour corriger", STOP_KEYWORD, VALIDATION_KEYWORD, CORRECTION_KEYWORD);
         public static readonly String SEARCHING_FOR_QR_CODES = "Recherche de QR codes en cours";
